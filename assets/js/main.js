@@ -653,9 +653,8 @@ function triggerEscape() {
   if (victoryUi) victoryUi.style.display = 'block';
 }
 
-// ── Tablero de Familias que Escaparon (Hall of Fame) ─────────
-let currentUploadedPhotoData = null;
-let webcamStream = null;
+// ── Firebase Realtime Database (Multi-Device Sync para GitHub Pages) ──
+let FIREBASE_DB_URL = localStorage.getItem('er_firebase_url') || 'https://escape-room-nostalgica-default-rtdb.firebaseio.com';
 
 function getStoredFamilies() {
   try {
@@ -667,19 +666,55 @@ function getStoredFamilies() {
   }
 }
 
-function renderFamiliesGrid() {
+async function fetchFamiliesList() {
+  if (FIREBASE_DB_URL) {
+    try {
+      const cleanUrl = FIREBASE_DB_URL.replace(/\/+$/, '') + '/familias.json';
+      const res = await fetch(cleanUrl, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          const list = Array.isArray(data) 
+            ? data.filter(Boolean) 
+            : Object.keys(data).map(k => ({ ...data[k], fbKey: k }));
+          list.sort((a, b) => (b.id || 0) - (a.id || 0));
+          localStorage.setItem('er_escaped_families', JSON.stringify(list));
+          return list;
+        }
+      }
+    } catch(e) {
+      console.warn('Firebase offline/fallback to local:', e);
+    }
+  }
+  return getStoredFamilies();
+}
+
+async function renderFamiliesGrid() {
   const grid = document.getElementById('families-grid');
   if (!grid) return;
 
-  const families = getStoredFamilies();
+  // Show quick cached or loading state
+  let families = getStoredFamilies();
+  if (families.length > 0) {
+    renderFamiliesCards(families);
+  }
 
-  if (families.length === 0) {
+  // Fetch updated list from Firebase Cloud in background
+  const cloudFamilies = await fetchFamiliesList();
+  renderFamiliesCards(cloudFamilies);
+}
+
+function renderFamiliesCards(families) {
+  const grid = document.getElementById('families-grid');
+  if (!grid) return;
+
+  if (!families || families.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 30px 10px; color: var(--green-dim);">
         <div style="font-size: 2.2rem; margin-bottom: 6px;">📷</div>
         <div style="font-size: 0.95rem; color: var(--amber); font-weight: bold;">Aún no hay familias en el mural de recuerdos.</div>
         <div style="font-size: 0.8rem; margin-top: 6px; color: #88cc99;">
-          ¡Completá los 7 desafíos analógicos y desbloqueá el sistema central para inmortalizar la foto de tu familia en este mural de honor!
+          ¡Completá los 8 desafíos analógicos y desbloqueá el sistema central para inmortalizar la foto de tu familia en este mural de honor!
         </div>
       </div>
     `;
@@ -991,12 +1026,25 @@ function saveFamilyToBoard() {
     date: dateStr
   };
 
+  // 1. Guardado local inmediato
   const list = getStoredFamilies();
-  list.unshift(newFamily); // Newest on top
+  list.unshift(newFamily);
   try {
     localStorage.setItem('er_escaped_families', JSON.stringify(list));
   } catch(e) {
-    alert('No se pudo guardar la foto por límite de almacenamiento del navegador.');
+    console.warn('LocalStorage limit exceeded, proceeding to cloud');
+  }
+
+  // 2. Sincronización en la nube con Firebase Realtime Database
+  if (FIREBASE_DB_URL) {
+    try {
+      const cleanUrl = FIREBASE_DB_URL.replace(/\/+$/, '') + '/familias.json';
+      fetch(cleanUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newFamily)
+      }).catch(err => console.warn('Firebase POST background error:', err));
+    } catch(e) {}
   }
 
   closeAddFamilyModal();

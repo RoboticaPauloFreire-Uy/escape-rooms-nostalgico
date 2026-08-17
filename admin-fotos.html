@@ -516,15 +516,36 @@
       </div>
     </div>
 
-    <!-- Stats summary -->
+    <!-- Stats summary & Cloud Status -->
     <div class="admin-stats">
       <div>
-        <span>TOTAL DE FAMILIAS REGISTRADAS: </span>
+        <span>TOTAL DE FAMILIAS: </span>
         <span class="stat-badge" id="total-count">0</span>
+        <span id="cloud-status-badge" style="margin-left:14px;font-size:0.78rem;padding:3px 8px;border-radius:3px;background:rgba(51,255,85,0.1);border:1px solid var(--green);color:var(--green);">
+          🟢 Nube Activa (Firebase)
+        </span>
       </div>
-      <div>
-        <span style="color:#8aab90;">Modo exclusivo de gestión: descargar en JPG de alta resolución y eliminar fotos.</span>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-action" onclick="toggleFirebaseConfig()" style="font-size:0.75rem;padding:4px 10px;background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);">
+          ⚙️ CONFIGURAR FIREBASE URL
+        </button>
       </div>
+    </div>
+
+    <!-- Firebase URL Settings Bar -->
+    <div id="firebase-config-panel" style="display:none;background:#051208;border:1px solid var(--amber);padding:12px 16px;border-radius:6px;margin-bottom:18px;">
+      <div style="font-size:0.8rem;color:var(--amber);font-weight:bold;margin-bottom:6px;">
+        ☁️ URL DE TU BASE DE DATOS FIREBASE REALTIME:
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" id="firebase-url-input" class="login-input" style="flex:1;min-width:280px;font-size:0.85rem;padding:6px 10px;text-align:left;letter-spacing:normal;" placeholder="https://tu-proyecto-rtdb.firebaseio.com">
+        <button class="btn-login-submit" onclick="saveFirebaseUrl()" style="padding:6px 16px;font-size:0.82rem;">
+          [ 💾 GUARDAR URL ]
+        </button>
+      </div>
+      <p style="font-size:0.72rem;color:#8ab894;margin-top:6px;">
+        Al guardar, todas las máquinas conectadas a GitHub Pages sincronizarán las fotos en tiempo real a esta base de datos gratuita de Google Firebase.
+      </p>
     </div>
 
     <!-- Grid of Polaroid cards -->
@@ -534,7 +555,7 @@
 
     <!-- Footer -->
     <div class="admin-footer">
-      <span>Sistema de Archivo de Fotos del Escape Room • Base de datos local (localStorage)</span>
+      <span>Sistema de Archivo de Fotos del Escape Room • Sincronización en la Nube (Google Firebase + localStorage)</span>
       <span>Colegio Paulo Freire © 1996</span>
     </div>
 
@@ -543,6 +564,28 @@
   <script>
     // Configuración de contraseña administrativa
     const ADMIN_PASSWORDS = ['1996', 'freire1996', 'admin1996', 'admin', 'freire'];
+
+    let FIREBASE_DB_URL = localStorage.getItem('er_firebase_url') || 'https://escape-room-nostalgica-default-rtdb.firebaseio.com';
+
+    function toggleFirebaseConfig() {
+      const p = document.getElementById('firebase-config-panel');
+      const input = document.getElementById('firebase-url-input');
+      if (p) {
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        if (input) input.value = FIREBASE_DB_URL;
+      }
+    }
+
+    function saveFirebaseUrl() {
+      const input = document.getElementById('firebase-url-input');
+      if (input) {
+        FIREBASE_DB_URL = input.value.trim();
+        localStorage.setItem('er_firebase_url', FIREBASE_DB_URL);
+        alert('✓ URL de Firebase actualizada correctamente.');
+        toggleFirebaseConfig();
+        renderAdminGrid();
+      }
+    }
 
     function checkAuth() {
       const isAuth = sessionStorage.getItem('er_admin_auth') === 'true';
@@ -598,20 +641,63 @@
       }
     }
 
-    function renderAdminGrid() {
+    async function fetchCloudFamilies() {
+      if (FIREBASE_DB_URL) {
+        try {
+          const cleanUrl = FIREBASE_DB_URL.replace(/\/+$/, '') + '/familias.json';
+          const res = await fetch(cleanUrl, { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data) {
+              const list = Array.isArray(data) 
+                ? data.filter(Boolean) 
+                : Object.keys(data).map(k => ({ ...data[k], fbKey: k }));
+              list.sort((a, b) => (b.id || 0) - (a.id || 0));
+              localStorage.setItem('er_escaped_families', JSON.stringify(list));
+              return list;
+            }
+          }
+        } catch(e) {
+          console.warn('Firebase sync warning:', e);
+        }
+      }
+      return getStoredFamilies();
+    }
+
+    async function renderAdminGrid() {
       const grid = document.getElementById('admin-grid');
       const countEl = document.getElementById('total-count');
-      const families = getStoredFamilies();
+      const badge = document.getElementById('cloud-status-badge');
+
+      if (badge) {
+        badge.innerHTML = FIREBASE_DB_URL 
+          ? '🟢 Nube Activa (Firebase Sync)' 
+          : '🟡 Modo Local (Sin sincronización)';
+      }
+
+      // Quick local render
+      let families = getStoredFamilies();
+      displayAdminCards(families);
+
+      // Cloud fresh sync
+      families = await fetchCloudFamilies();
+      displayAdminCards(families);
+    }
+
+    function displayAdminCards(families) {
+      const grid = document.getElementById('admin-grid');
+      const countEl = document.getElementById('total-count');
+      if (!grid) return;
 
       if (countEl) countEl.textContent = families.length;
 
-      if (families.length === 0) {
+      if (!families || families.length === 0) {
         grid.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">📷</div>
             <div class="empty-state-title">No hay fotografías registradas en el mural</div>
             <p style="font-size:0.85rem;color:#8ab894;max-width:450px;margin:0 auto 16px;">
-              Cuando las familias completen el escape e ingresen su foto, aparecerán aquí para que puedas gestionarlas y descargarlas.
+              Cuando las familias completen el escape desde cualquier celular o PC, aparecerán automáticamente aquí para que puedas gestionarlas y descargarlas.
             </p>
             <a href="index.html" class="btn-action btn-back" style="display:inline-flex;">
               ◄ IR AL PANEL DEL ESCAPE ROOM
@@ -640,7 +726,7 @@
               <button class="btn-card-download" onclick="downloadSingleJpg(${fam.id})">
                 💾 DESCARGAR JPG
               </button>
-              <button class="btn-card-delete" onclick="deleteSingleFamily(${fam.id})" title="Eliminar foto">
+              <button class="btn-card-delete" onclick="deleteSingleFamily(${fam.id}, '${fam.fbKey || ''}')" title="Eliminar foto">
                 🗑️
               </button>
             </div>
@@ -714,7 +800,7 @@
       }
     }
 
-    function deleteSingleFamily(id) {
+    async function deleteSingleFamily(id, fbKey) {
       const families = getStoredFamilies();
       const fam = families.find(f => f.id === id);
       const name = fam ? fam.name : 'esta foto';
@@ -723,12 +809,24 @@
         return;
       }
 
+      // 1. Delete from local storage
       const updated = families.filter(f => f.id !== id);
       localStorage.setItem('er_escaped_families', JSON.stringify(updated));
+
+      // 2. Delete from Firebase Cloud
+      if (FIREBASE_DB_URL && fbKey) {
+        try {
+          const cleanUrl = FIREBASE_DB_URL.replace(/\/+$/, '') + `/familias/${fbKey}.json`;
+          await fetch(cleanUrl, { method: 'DELETE' });
+        } catch(e) {
+          console.warn('Error deleting from Firebase:', e);
+        }
+      }
+
       renderAdminGrid();
     }
 
-    function clearAllFamilies() {
+    async function clearAllFamilies() {
       const families = getStoredFamilies();
       if (families.length === 0) return;
 
@@ -736,7 +834,19 @@
         return;
       }
 
+      // 1. Clear local
       localStorage.removeItem('er_escaped_families');
+
+      // 2. Clear Firebase
+      if (FIREBASE_DB_URL) {
+        try {
+          const cleanUrl = FIREBASE_DB_URL.replace(/\/+$/, '') + '/familias.json';
+          await fetch(cleanUrl, { method: 'DELETE' });
+        } catch(e) {
+          console.warn('Error clearing Firebase:', e);
+        }
+      }
+
       renderAdminGrid();
     }
 
