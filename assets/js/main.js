@@ -655,6 +655,8 @@ function triggerEscape() {
 
 // ── Firebase Realtime Database (Multi-Device Sync para GitHub Pages) ──
 let FIREBASE_DB_URL = localStorage.getItem('er_firebase_url') || 'https://escape-room-nostalgica-default-rtdb.firebaseio.com';
+let currentUploadedPhotoData = null;
+let webcamStream = null;
 
 function getStoredFamilies() {
   try {
@@ -851,10 +853,12 @@ async function startWebcamCapture() {
 }
 
 function stopWebcam() {
-  if (webcamStream) {
-    webcamStream.getTracks().forEach(track => track.stop());
-    webcamStream = null;
-  }
+  try {
+    if (typeof webcamStream !== 'undefined' && webcamStream) {
+      webcamStream.getTracks().forEach(track => track.stop());
+      webcamStream = null;
+    }
+  } catch(e) {}
   const video = document.getElementById('webcam-video');
   if (video) video.srcObject = null;
   const webcamContainer = document.getElementById('webcam-container');
