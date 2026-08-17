@@ -956,13 +956,16 @@
             👉 Haga click aquí o en la <b>Unidad de Disquete A:</b> abajo para insertar el disco.
           </p>
 
-          <!-- Direct Board Access & History -->
-          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" onclick="event.stopPropagation()">
-            <button class="btn-crt-cancel" onclick="viewFamiliesDirectly()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 14px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
-              👥 VER TABLERO DE FAMILIAS QUE ESCAPARON
+          <!-- Direct Board Access & History & Test Button -->
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;" onclick="event.stopPropagation()">
+            <button class="btn-crt-cancel" onclick="viewFamiliesDirectly()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 12px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
+              👥 VER TABLERO DE FAMILIAS
             </button>
-            <button class="btn-crt-cancel" onclick="openPC286HistoryModal()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 14px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
-              💻 VER HISTORIA: COMPUTADORA 286 (1982)
+            <button class="btn-crt-cancel" onclick="openAddFamilyModal()" style="background:rgba(51,255,85,0.15);border:1px solid var(--green);color:var(--green);font-size:0.8rem;padding:6px 12px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(51,255,85,0.25);">
+              🧪 PROBAR FOTO FAMILIAR
+            </button>
+            <button class="btn-crt-cancel" onclick="openPC286HistoryModal()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 12px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
+              💻 HISTORIA 286
             </button>
           </div>
         </div>
@@ -1058,6 +1061,9 @@
                 <span>🏆</span>
                 <span>TABLERO DE FAMILIAS QUE ESCAPARON</span>
               </div>
+              <button type="button" class="btn-crt-cancel" onclick="openAddFamilyModal()" style="font-size:0.75rem;padding:3px 10px;background:rgba(51,255,85,0.15);border:1px solid var(--green);color:var(--green);cursor:pointer;border-radius:3px;">
+                🧪 PROBAR REGISTRO FOTO
+              </button>
             </div>
             <div style="font-size:0.8rem;color:var(--green-dim);margin:6px 0 10px;border-bottom:1px dashed var(--green-dim);padding-bottom:6px;">
               Mural de recuerdos del Colegio Paulo Freire • Sin puntos ni rankings: el cuadro de honor exclusivo de las familias que lograron escapar.
