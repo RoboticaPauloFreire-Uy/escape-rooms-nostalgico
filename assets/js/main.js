@@ -642,6 +642,22 @@ function triggerEscape() {
   // Clear module localStorage for fresh next game (PRESERVING er_escaped_families)
   clearGameProgress();
 
+  // Ensure monitor is powered on
+  isMonitorPowered = true;
+  const screen = document.getElementById('screen-surface');
+  const powerLed = document.getElementById('monitor-power-led');
+  const powerBtn = document.getElementById('btn-pc-power');
+  if (screen) screen.classList.remove('powered-off');
+  if (powerLed) powerLed.classList.remove('off');
+  if (powerBtn) powerBtn.classList.remove('off');
+
+  // Ensure floppy drive appears inserted
+  const disk = document.getElementById('floppy-disk');
+  const led = document.getElementById('floppy-led');
+  if (disk) disk.classList.add('inserted');
+  if (led) led.classList.add('reading');
+  floppyInserted = true;
+
   const noDiskUi = document.getElementById('screen-no-disk-ui');
   const systemUi = document.getElementById('screen-system-ui');
   const victoryUi = document.getElementById('screen-victory-ui');
@@ -650,7 +666,10 @@ function triggerEscape() {
   if (noDiskUi) noDiskUi.style.display = 'none';
   if (systemUi) systemUi.style.display = 'none';
   if (timeVal) timeVal.textContent = `⏱️ ${finalTime}`;
-  if (victoryUi) victoryUi.style.display = 'block';
+  if (victoryUi) {
+    victoryUi.style.display = 'block';
+    victoryUi.scrollTop = 0;
+  }
 }
 
 // ── Firebase Realtime Database (Multi-Device Sync para GitHub Pages) ──
