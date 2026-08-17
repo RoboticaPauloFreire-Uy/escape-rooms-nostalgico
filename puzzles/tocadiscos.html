@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tocadiscos de Vinilo — Módulo 7</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    body {
+      background: #090b09;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .page-top {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .page-top-title {
+      font-size: 1.3rem;
+      letter-spacing: .15em;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 920px;
+    }
+
+    /* ── TURNTABLE CHASSIS (WINCO / TECHNICS VINTAGE) ── */
+    .turntable-cabinet {
+      width: 480px;
+      background: linear-gradient(145deg, #3d2b1f 0%, #241710 40%, #150d09 100%);
+      border: 4px solid #5a3d28;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.2),
+        inset 0 -6px 12px rgba(0,0,0,0.8),
+        0 15px 40px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .turntable-top-plate {
+      background: linear-gradient(180deg, #dcd8d0 0%, #b8b3a8 60%, #9c968a 100%);
+      border-radius: 10px;
+      border: 2px solid #7d776c;
+      padding: 18px;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.6), inset 0 -3px 6px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      min-height: 320px;
+    }
+
+    /* ── ROTATING VINYL PLATTER ── */
+    .platter-wrap {
+      width: 270px;
+      height: 270px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #555 0%, #222 70%, #111 100%);
+      border: 4px solid #888;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vinyl-disc {
+      width: 256px;
+      height: 256px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 45% 45%, #222 0%, #0d0d0d 40%, #1a1a1a 60%, #080808 100%);
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.7);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .vinyl-disc.spinning {
+      animation: spinPlatter 1.8s linear infinite;
+    }
+    .vinyl-disc.spinning-fast {
+      animation: spinPlatter 1.33s linear infinite;
+    }
+
+    @keyframes spinPlatter {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Grooves */
+    .vinyl-grooves {
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.08);
+      box-shadow:
+        /* Pista 1 (Surco 1 Exterior) */
+        inset 0 0 0 10px rgba(255,255,255,0.03),
+        inset 0 0 0 20px rgba(0,0,0,0.5),
+        /* Separador Surco 1 y Surco 2 */
+        inset 0 0 0 26px rgba(255,255,255,0.09),
+        /* Pista 2 (Surco 2 Medio) */
+        inset 0 0 0 38px rgba(255,255,255,0.02),
+        inset 0 0 0 52px rgba(0,0,0,0.5),
+        /* Separador Surco 2 y Surco 3 */
+        inset 0 0 0 58px rgba(255,255,255,0.09),
+        /* Pista 3 (Surco 3 Interior) */
+        inset 0 0 0 70px rgba(255,255,255,0.02),
+        inset 0 0 0 80px rgba(0,0,0,0.6);
+      pointer-events: none;
+    }
+
+    /* ── LÍNEA ROJA (SURCO 2 / PISTA 2 - ILARIÉ) ── */
+    .target-red-groove {
+      position: absolute;
+      width: 172px;
+      height: 172px;
+      border-radius: 50%;
+      border: 3px dashed #ff2222;
+      box-shadow: 0 0 12px rgba(255, 34, 34, 0.85), inset 0 0 8px rgba(255, 34, 34, 0.5);
+      pointer-events: none;
+      animation: pulseRedGroove 2s infinite alternate;
+      z-index: 1;
+    }
+    @keyframes pulseRedGroove {
+      from { border-color: #ff3333; box-shadow: 0 0 6px #ff0000; opacity: 0.75; }
+      to   { border-color: #ff6666; box-shadow: 0 0 16px #ff2222; opacity: 1; }
+    }
+
+    /* Center Label (Sondor / Paulo Freire Records) */
+    .vinyl-label {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffdd55 0%, #e6a817 70%, #996e00 100%);
+      border: 2px solid #5a4000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      color: #2b1f00;
+      position: relative;
+      z-index: 2;
+    }
+    .center-hole {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #c5beae;
+      border: 2px solid #333;
+      box-shadow: inset 0 1px 2px #000;
+      margin: 2px 0;
+    }
+
+    /* ── TONEARM & NEEDLE (BRAZO FONOCAPTOR ARRASTRABLE) ── */
+    .tonearm-assembly {
+      position: absolute;
+      right: 18px;
+      top: 20px;
+      width: 130px;
+      height: 280px;
+      cursor: grab;
+      user-select: none;
+    }
+    .tonearm-assembly:active { cursor: grabbing; }
+
+    .tonearm-base {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a8a39a 50%, #444 100%);
+      border: 2px solid #666;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
+    .tonearm-rod {
+      width: 8px;
+      height: 180px;
+      background: linear-gradient(90deg, #eee 0%, #bbb 50%, #666 100%);
+      border-radius: 4px;
+      position: absolute;
+      right: 30px;
+      top: 34px;
+      transform-origin: 24px 10px;
+      transform: rotate(0deg);
+      box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+      transition: transform 0.08s ease-out;
+    }
+    .tonearm-headshell {
+      width: 22px;
+      height: 38px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 3px 3px 6px 6px;
+      position: absolute;
+      bottom: -15px;
+      left: -7px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.7);
+    }
+    .tonearm-needle-tip {
+      width: 5px;
+      height: 5px;
+      background: #ff3333;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 2px;
+      left: 8px;
+      box-shadow: 0 0 6px #ff3333;
+      transition: all 0.2s;
+    }
+    .tonearm-needle-tip.on-target {
+      background: #33ff55;
+      box-shadow: 0 0 12px #33ff55, 0 0 3px #fff;
+    }
+
+    /* ── CONTROLS BAR ── */
+    .turntable-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.4);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #5a3d28;
+    }
+    .btn-tt {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      background: linear-gradient(180deg, #5c4330, #362418);
+      color: #ffd899;
+      border: 1px solid #8c6848;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      transition: all 0.15s;
+    }
+    .btn-tt:hover { background: #7a583e; color: #fff; }
+    .btn-tt.active {
+      background: var(--green-dim);
+      color: #fff;
+      border-color: var(--green);
+      box-shadow: 0 0 10px rgba(51,255,85,0.4);
+    }
+
+    /* ── RIGHT PANEL (VINYL SLEEVE & AUDIO PLAYBACK) ── */
+    .vinyl-clue-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 360px;
+      flex: 1;
+    }
+
+    .vinyl-sleeve {
+      background: #18120c;
+      border: 2px solid #6b4d32;
+      border-radius: 6px;
+      padding: 16px;
+      font-family: 'Special Elite', cursive, monospace;
+      color: #e0d0b8;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .sleeve-title {
+      font-size: 1.15rem;
+      color: #ffcc66;
+      border-bottom: 1px solid #5a3d28;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+    .tracklist {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+    .track-item {
+      padding: 3px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .track-item:hover { background: rgba(255,200,100,0.15); }
+    .track-item.playing {
+      background: rgba(51,255,85,0.15);
+      color: var(--green-bright);
+      font-weight: bold;
+    }
+
+    .playback-status-box {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--green-dim);
+      line-height: 1.5;
+      min-height: 60px;
+    }
+    .playback-status-box.active {
+      color: var(--green);
+      text-shadow: 0 0 6px var(--green);
+      border-color: var(--green);
+    }
+
+    /* ── Hint Box & Penalty UI ── */
+    .hint-container {
+      background: rgba(255, 184, 0, 0.04);
+      border: 1px solid var(--amber-dim);
+      border-radius: 6px;
+      padding: 12px 14px;
+      box-shadow: 0 0 12px rgba(255, 184, 0, 0.1);
+    }
+    .hint-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 6px var(--amber);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .penalty-warning-badge {
+      background: rgba(255, 60, 60, 0.12);
+      border: 1px dashed #ff5544;
+      color: #ff9988;
+      font-size: 0.76rem;
+      line-height: 1.4;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .btn-unlock-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 7px 12px;
+      width: 100%;
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 184, 0, 0.25);
+      transition: all 0.15s;
+    }
+    .btn-unlock-hint:hover {
+      background: var(--amber);
+      color: #000;
+      box-shadow: 0 0 16px var(--amber);
+    }
+    .penalty-applied-badge {
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: bold;
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-align: center;
+      animation: pulseAmber 1s infinite alternate;
+    }
+
+    /* Modal confirmation for hint */
+    .hint-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 10, 0, 0.85);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .hint-confirm-box {
+      background: #051a08;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 25px rgba(255, 184, 0, 0.4);
+      border-radius: 6px;
+      max-width: 380px;
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .hint-confirm-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+    }
+    .btn-hint-act {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-hint-yes {
+      background: rgba(255, 60, 60, 0.2);
+      border: 1px solid #ff4444;
+      color: #ff8888;
+    }
+    .btn-hint-yes:hover {
+      background: #ff4444;
+      color: #000;
+    }
+    .btn-hint-no {
+      background: rgba(51, 255, 85, 0.1);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+    .btn-hint-no:hover {
+      background: var(--green);
+      color: #000;
+    }
+
+    @keyframes pulseAmber {
+      from { box-shadow: 0 0 10px rgba(255,184,0,.2); }
+      to   { box-shadow: 0 0 30px rgba(255,184,0,.4); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-top">
+    <div class="page-top-title glow">🎵 MÓDULO 7 — BANDEJA GIRADISCOS (VINILO)</div>
+    <a href="../index.html" class="btn-back">◄ PANEL CENTRAL</a>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- TURNTABLE CABINET -->
+    <div class="turntable-cabinet">
+      
+      <div class="turntable-top-plate">
+        
+        <!-- Platter & Vinyl Disc -->
+        <div class="platter-wrap" id="platter-area" onclick="onPlatterClick(event)">
+          <div class="vinyl-disc" id="vinyl-disc" title="Plato de vinilo con surcos de audio">
+            <div class="vinyl-grooves"></div>
+            <!-- LÍNEA ROJA DESTACADA DE LA PISTA SECRETA -->
+            <div class="target-red-groove" id="target-red-groove" title="Surco Rojo (Pista Secreta 2)"></div>
+            <div class="vinyl-label">
+              <div style="font-size:0.58rem;font-weight:bold;letter-spacing:.08em;color:#770000">XUXA EN ESPAÑOL</div>
+              <div class="center-hole"></div>
+              <div style="font-size:0.5rem;font-weight:bold">33 ⅓ RPM ● RCA / SONDOR</div>
+              <div style="font-size:0.44rem;color:#5a4000">ÉXITOS 1990</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tonearm Assembly (Arrastrable con el mouse) -->
+        <div class="tonearm-assembly" id="tonearm-assembly" title="Arrastrá el brazo del tocadiscos hacia el disco">
+          <div class="tonearm-base"></div>
+          <div class="tonearm-rod" id="tonearm-rod">
+            <div class="tonearm-headshell">
+              <div class="tonearm-needle-tip" id="needle-tip"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="turntable-controls">
+        <button class="btn-tt" id="btn-power" onclick="togglePower()">[ POWER: OFF ]</button>
+        
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#b89970">VELOCIDAD:</span>
+          <button class="btn-tt" id="btn-speed-33" onclick="setSpeed(33)">33 RPM</button>
+          <button class="btn-tt active" id="btn-speed-45" onclick="setSpeed(45)">45 RPM</button>
+        </div>
+      </div>
+
+    </div><!-- /turntable-cabinet -->
+
+
+    <!-- RIGHT PANEL: SLEEVE & AUDIO FEEDBACK -->
+    <div class="vinyl-clue-panel">
+      
+      <!-- Vinyl Sleeve Clue -->
+      <div class="vinyl-sleeve">
+        <div class="sleeve-title">📀 VINILO: XUXA — GRANDES ÉXITOS (1990)</div>
+        <p style="font-size:0.8rem;line-height:1.4;margin-bottom:8px">
+          "Disco de vinilo infantil que sonaba en los festivales del Colegio Paulo Freire."
+        </p>
+        <div class="tracklist">
+          <div class="track-item" id="track-btn-1" onclick="selectTrack(1)">▶ Lado A - Pista 1: Danza de Xuxa (Intro)</div>
+          <div class="track-item" id="track-btn-2" onclick="selectTrack(2)" style="color:#ff6666">▶ Lado A - Pista 2: Ilarié (Surco Rojo - Mensaje Oculto) ⭐</div>
+          <div class="track-item" id="track-btn-3" onclick="selectTrack(3)">▶ Lado A - Pista 3: Dulce Miel</div>
+        </div>
+      </div>
+
+      <!-- Playback readout -->
+      <div class="playback-status-box" id="playback-box">
+        &gt; ESTADO: Tocadiscos apagado. Encendé el equipo y colocá el brazo sobre el vinilo.
+      </div>
+
+      <!-- Vinyl History Button -->
+      <button type="button" class="btn-unlock-hint" onclick="openVinylHistoryModal()" style="background:rgba(255,184,0,0.12);border:1px solid var(--amber);color:var(--amber);box-shadow:0 0 10px rgba(255,184,0,0.2);margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Share Tech Mono',monospace;font-size:0.8rem;padding:7px 10px;border-radius:4px;">
+        <span>🎵</span>
+        <span>VER HISTORIA DEL TOCADISCOS Y EL VINILO</span>
+      </button>
+
+      <!-- Hint System Box -->
+      <div class="hint-container" id="hint-container">
+        <div class="hint-header">
+          <span>💡 PISTA: REPRODUCCIÓN DEL VINILO</span>
+        </div>
+
+        <!-- Locked hint view -->
+        <div class="hint-locked-box" id="hint-locked-box">
+          <p style="font-size:0.8rem;color:#e8a040;line-height:1.4">
+            ¿No lográs descifrar la voz de Xuxa o la pista que contiene la clave?
+          </p>
+          <div class="penalty-warning-badge">
+            ⚠️ <b>PENALIZACIÓN:</b> Revelar la pista sumará <b>+5 MINUTOS</b> al tiempo total de escape.
+          </div>
+          <button class="btn-unlock-hint" onclick="requestUnlockHint()">
+            [ 🔓 VER PISTA TOCADISCOS (+5 MIN) ]
+          </button>
+        </div>
+
+        <!-- Revealed hint reference -->
+        <div class="hint-revealed-box" id="hint-revealed-box" style="display:none;">
+          <div class="penalty-applied-badge">
+            ⏱️ ¡PENALIZACIÓN: +5 MINUTOS SUMADOS AL CRONÓMETRO!
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:.82rem;line-height:1.4;color:#99e699">
+            1. Encendé el equipo con <b>[ POWER: ON ]</b>.<br>
+            2. Seleccioná la velocidad en <b>[ 33 RPM ]</b> (en 45 RPM la voz se oye incomprensiblemente rápida).<br>
+            3. Colocá la púa sobre la <b>LÍNEA ROJA (Pista 2 - Ilarié)</b> para escuchar el mensaje secreto con el código.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ══ MODAL HISTORIA DEL TOCADISCOS Y EL VINILO ══ -->
+  <div class="hint-confirm-overlay" id="vinyl-history-modal" style="display:none;z-index:1100;">
+    <div class="hint-confirm-box" style="max-width:520px;border-color:var(--amber);box-shadow:0 0 35px rgba(255,184,0,0.45);text-align:left;background:#0d0a06;padding:18px 22px;">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #4a3010;padding-bottom:8px;margin-bottom:12px;">
+        <div style="font-size:1.05rem;font-weight:bold;color:var(--amber);display:flex;align-items:center;gap:6px;">
+          <span>🎵</span>
+          <span>EL TOCADISCOS ANALÓGICO Y EL DISCO DE VINILO</span>
+        </div>
+        <button type="button" onclick="closeVinylHistoryModal()" style="background:transparent;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;font-weight:bold;">✕</button>
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="text-align:center;flex-shrink:0;margin:0 auto;">
+          <img src="../assets/images/tocadiscos_retro.jpg" alt="Tocadiscos Vintage y Vinilo" style="width:145px;height:145px;object-fit:cover;border-radius:6px;border:2px solid var(--amber);box-shadow:0 0 16px rgba(255,184,0,0.35);display:block;">
+          <span style="font-size:0.68rem;color:#d0b080;margin-top:4px;display:block;">Bandeja Giradiscos Hi-Fi</span>
+        </div>
+
+        <div style="flex:1;min-width:220px;font-size:0.82rem;line-height:1.45;color:#e8d8c0;">
+          <div style="background:rgba(255,184,0,0.1);border-left:3px solid var(--amber);padding:5px 8px;margin-bottom:8px;font-weight:bold;color:var(--amber);">
+            🎶 La magia del sonido físico en los 80 y 90:
+          </div>
+          <p style="margin-bottom:6px;">
+            • <b>Púas, Surcos y RPM:</b> La música se leía mediante una aguja de diamante que vibraba dentro de los microsurcos tallados en el acetato de vinilo a 33 o 45 revoluciones por minuto.
+          </p>
+          <p style="margin-bottom:6px;">
+            • <b>El Fenómeno de Xuxa:</b> A finales de los 80 y principios de los 90, los discos de <i>"El Show de Xuxa"</i> (como <i>Ilarié</i> y <i>Danza de Xuxa</i>) eran la banda sonora infaltable en los cumpleaños, patios escolares y actos del Colegio Paulo Freire.
+          </p>
+          <p>
+            • <b>Misión en el Escape Room:</b> Recrea la experiencia de encender el plato, calibrar la velocidad a 33 RPM y ubicar la púa en el surco exacto.
+          </p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;border-top:1px solid #4a3010;padding-top:10px;">
+        <button type="button" class="btn-hint-act btn-hint-no" style="background:var(--amber);color:#000;border:none;font-weight:bold;padding:6px 24px;" onclick="closeVinylHistoryModal()">
+          [ ENTENDIDO / CERRAR ]
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal confirmation for hint -->
+  <div class="hint-confirm-overlay" id="hint-confirm-overlay" style="display:none;">
+    <div class="hint-confirm-box">
+      <div class="hint-confirm-title">⚠️ SOLICITAR PISTA DE VINILO</div>
+      <p style="font-size:0.86rem;color:#ffd080;line-height:1.4;margin:12px 0;">
+        ¿Deseas desbloquear la guía para usar el tocadiscos?<br>
+        Se sumarán <b>5 minutos de penalización</b> inmediatamente al cronómetro total de escape.
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+        <button class="btn-hint-act btn-hint-yes" onclick="applyHintPenalty()">[ SÍ, APLICAR +5 MIN ]</button>
+        <button class="btn-hint-act btn-hint-no" onclick="closeHintConfirm()">[ CANCELAR ]</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const SECRET_CODE = '528';
+  let isPowered = false;
+  let currentSpeed = 45; // Inicia por defecto en 45 RPM
+  let armAngle = 0; // 0 deg (rest) to 56 deg (center)
+  let solved = false;
+
+  const TRACKS = {
+    1: {
+      name: 'Pista 1: Danza de Xuxa',
+      text33: '🎶 <i>[ Sonando a 33 RPM ]: "♫ Venga, venga, salte, salte, que la fiesta va a empezar... ♫ (Danza de Xuxa)"</i>',
+      text45: '🐿️ <i>[ Sonando a 45 RPM ]: "♫ (Danza de Xuxa hiper-acelerada como ardilla) ♫"</i>'
+    },
+    2: {
+      name: 'Pista 2: Ilarié (Surco Rojo)',
+      target: true,
+      text33: '🎉 <b>XUXA - ILARIÉ (33 RPM - SURCO ROJO):</b><br><i>"♫ ¡Ilari, lari, larié, ¡oh, oh, oh! ¡Ilari, lari, larié, ¡oh, oh, oh!...<br>Atención Paulo Freire: la clave secreta de la nave de Xuxa es <span style=\"color:#ffd700;font-size:1.35rem;font-weight:bold;letter-spacing:.15em;\">528</span>!"</i><div style=\"margin-top:8px;padding:6px 10px;background:rgba(51,255,85,0.15);border:1px solid var(--green);color:var(--green-bright);font-weight:bold;border-radius:4px;text-align:center;\">✓ CÓDIGO DESBLOQUEADO: 528</div>',
+      text45: '🔊 <i>[ Sonando a 45 RPM - Voz hiper-acelerada ]:</i><br>"¡¡¡(Ilari-lari-é a toda velocidad incomprensible)!!!"<br><b style="color:var(--amber)">👉 Cambiá el selector a [ 33 RPM ] para escuchar la voz normal y obtener el código.</b>'
+    },
+    3: {
+      name: 'Pista 3: Dulce Miel',
+      text33: '🎶 <i>[ Sonando a 33 RPM ]: "♫ Dulce, dulce, dulce miel... ven conmigo a cantar... ♫"</i>',
+      text45: '🐿️ <i>[ Sonando a 45 RPM ]: "♫ (Dulce miel ultra rápida a 45 RPM) ♫"</i>'
+    }
+  };
+
+  // ── Web Audio Synthesizer para Tocadiscos & Canción de Xuxa ──
+  let audioCtx = null;
+  let musicLoopInterval = null;
+  let currentPlayingTrack = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function stopMusic() {
+    if (musicLoopInterval) {
+      clearInterval(musicLoopInterval);
+      musicLoopInterval = null;
+    }
+    currentPlayingTrack = null;
+  }
+
+  function playNote(freq, duration, type='triangle', gainVal=0.08, delay=0) {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(gainVal, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration - 0.02);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration);
+    } catch(e) {}
+  }
+
+  function playTrackMusic(trackIdx, speedMultiplier) {
+    const trackKey = `track_${trackIdx}_${speedMultiplier}`;
+    if (currentPlayingTrack === trackKey) return; // Ya está sonando esta pista a esta velocidad
+
+    stopMusic();
+    currentPlayingTrack = trackKey;
+
+    const pitchScale = speedMultiplier === 45 ? 1.38 : 1.0;
+    const tempo = speedMultiplier === 45 ? 0.11 : 0.16;
+
+    let melody = [];
+
+    if (trackIdx === 1) {
+      // 🎶 PISTA 1: "Danza de Xuxa" (Venga, venga, salte, salte...)
+      melody = [
+        { f: 293.66 * pitchScale, d: tempo * 1.1 }, // D4
+        { f: 369.99 * pitchScale, d: tempo * 1.1 }, // F#4
+        { f: 440.00 * pitchScale, d: tempo * 1.1 }, // A4
+        { f: 440.00 * pitchScale, d: tempo * 1.1 }, // A4
+        { f: 493.88 * pitchScale, d: tempo * 1.4 }, // B4
+        { f: 440.00 * pitchScale, d: tempo * 1.1 }, // A4
+        { f: 369.99 * pitchScale, d: tempo * 1.1 }, // F#4
+        { f: 293.66 * pitchScale, d: tempo * 1.6 }, // D4
+        { f: 329.63 * pitchScale, d: tempo * 1.1 }, // E4
+        { f: 369.99 * pitchScale, d: tempo * 1.1 }, // F#4
+        { f: 440.00 * pitchScale, d: tempo * 1.1 }, // A4
+        { f: 369.99 * pitchScale, d: tempo * 1.1 }, // F#4
+        { f: 329.63 * pitchScale, d: tempo * 1.8 }  // E4
+      ];
+    } else if (trackIdx === 2) {
+      // 🌟 PISTA 2: "Ilarié" (Ilari, lari, larié, ¡oh, oh, oh! - Mensaje Secreto 528)
+      melody = [
+        { f: 329.63 * pitchScale, d: tempo },       // E4  (I)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (la)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (ri)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (la)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (ri)
+        { f: 554.37 * pitchScale, d: tempo * 1.8 }, // C#5 (é)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (oh)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (oh)
+        { f: 369.99 * pitchScale, d: tempo * 1.5 }, // F#4 (oh)
+        { f: 329.63 * pitchScale, d: tempo },       // E4  (I)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (la)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (ri)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (la)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (ri)
+        { f: 554.37 * pitchScale, d: tempo * 1.8 }, // C#5 (é)
+        { f: 493.88 * pitchScale, d: tempo },       // B4  (oh)
+        { f: 415.30 * pitchScale, d: tempo },       // G#4 (oh)
+        { f: 329.63 * pitchScale, d: tempo * 2.0 }  // E4  (oh)
+      ];
+    } else if (trackIdx === 3) {
+      // 🍯 PISTA 3: "Dulce Miel" (Dulce, dulce, dulce miel... ven conmigo a cantar...)
+      melody = [
+        { f: 293.66 * pitchScale, d: tempo * 1.2 }, // D4  (Dul-)
+        { f: 369.99 * pitchScale, d: tempo * 1.2 }, // F#4 (-ce)
+        { f: 440.00 * pitchScale, d: tempo * 1.2 }, // A4  (dul-)
+        { f: 587.33 * pitchScale, d: tempo * 1.5 }, // D5  (-ce)
+        { f: 554.37 * pitchScale, d: tempo * 1.1 }, // C#5 (dul-)
+        { f: 493.88 * pitchScale, d: tempo * 1.1 }, // B4  (-ce)
+        { f: 440.00 * pitchScale, d: tempo * 1.8 }, // A4  (miel)
+        { f: 392.00 * pitchScale, d: tempo * 1.1 }, // G4
+        { f: 369.99 * pitchScale, d: tempo * 1.1 }, // F#4
+        { f: 329.63 * pitchScale, d: tempo * 1.1 }, // E4
+        { f: 293.66 * pitchScale, d: tempo * 2.0 }  // D4
+      ];
+    }
+
+    if (melody.length === 0) return;
+
+    function playLoop() {
+      let timeOffset = 0;
+      melody.forEach((note) => {
+        const type = speedMultiplier === 45 ? 'sawtooth' : 'triangle';
+        const vol  = speedMultiplier === 45 ? 0.05 : 0.08;
+        playNote(note.f, note.d, type, vol, timeOffset);
+        timeOffset += note.d * 1.1;
+      });
+    }
+
+    playLoop();
+    const loopDuration = melody.reduce((acc, n) => acc + n.d * 1.1, 0) * 1000 + 350;
+    musicLoopInterval = setInterval(playLoop, loopDuration);
+  }
+
+  function playChime() {
+    try {
+      const ctx = getAudioCtx();
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        playNote(freq, 0.35, 'triangle', 0.12, i * 0.1);
+      });
+    } catch(e) {}
+  }
+
+  function togglePower() {
+    getAudioCtx();
+    isPowered = !isPowered;
+    const btn = document.getElementById('btn-power');
+    const disc = document.getElementById('vinyl-disc');
+    
+    if (isPowered) {
+      btn.textContent = '[ POWER: ON ]';
+      btn.classList.add('active');
+      disc.className = currentSpeed === 33 ? 'vinyl-disc spinning' : 'vinyl-disc spinning-fast';
+    } else {
+      btn.textContent = '[ POWER: OFF ]';
+      btn.classList.remove('active');
+      disc.className = 'vinyl-disc';
+    }
+    updateAudioPlayback();
+  }
+
+  function setSpeed(speed) {
+    getAudioCtx();
+    currentSpeed = speed;
+    document.getElementById('btn-speed-33').classList.toggle('active', speed === 33);
+    document.getElementById('btn-speed-45').classList.toggle('active', speed === 45);
+    
+    const disc = document.getElementById('vinyl-disc');
+    if (isPowered) {
+      disc.className = speed === 33 ? 'vinyl-disc spinning' : 'vinyl-disc spinning-fast';
+    }
+    updateAudioPlayback();
+  }
+
+  function setArmAngle(deg) {
+    getAudioCtx();
+    armAngle = Math.max(0, Math.min(65, deg));
+    updateArmVisuals();
+    updateAudioPlayback();
+  }
+
+  function getCurrentTrack() {
+    const needle = document.getElementById('needle-tip');
+    const platter = document.getElementById('vinyl-disc');
+    if (!needle || !platter) return 0;
+    
+    const nRect = needle.getBoundingClientRect();
+    const pRect = platter.getBoundingClientRect();
+    
+    const needleX = nRect.left + nRect.width / 2;
+    const needleY = nRect.top + nRect.height / 2;
+    const platterCenterX = pRect.left + pRect.width / 2;
+    const platterCenterY = pRect.top + pRect.height / 2;
+    
+    const dist = Math.hypot(needleX - platterCenterX, needleY - platterCenterY);
+    const platterRadius = pRect.width / 2;
+    
+    // Fuera del plato
+    if (dist > platterRadius + 8 || armAngle < 15) return 0;
+    
+    // Pista 1: Borde exterior (por fuera de la línea roja): dist >= 95px
+    if (dist >= 95) return 1;
+    
+    // Pista 2: SURCO ROJO (la línea roja está en radio 86px): dist entre 76px y 95px
+    if (dist >= 76 && dist < 95) return 2;
+    
+    // Pista 3: Surco interior (por dentro de la línea roja): dist < 76px
+    return 3;
+  }
+
+  function selectTrack(trackNum) {
+    getAudioCtx();
+    if (!isPowered) togglePower();
+    if (trackNum === 2) {
+      if (currentSpeed !== 33) setSpeed(33);
+      setArmAngle(49); // Cae exactamente sobre la línea roja
+    } else if (trackNum === 1) {
+      setArmAngle(36); // Pista 1 exterior
+    } else if (trackNum === 3) {
+      setArmAngle(58); // Pista 3 interior
+    }
+  }
+
+  function onPlatterClick(e) {
+    getAudioCtx();
+    if (!isPowered) togglePower();
+    if (currentSpeed !== 33) setSpeed(33);
+    setArmAngle(49);
+  }
+
+  function updateArmVisuals() {
+    const rod = document.getElementById('tonearm-rod');
+    const needle = document.getElementById('needle-tip');
+    rod.style.transform = `rotate(${armAngle}deg)`;
+
+    const trackIdx = getCurrentTrack();
+    needle.classList.toggle('on-target', trackIdx === 2);
+
+    [1, 2, 3].forEach(t => {
+      const el = document.getElementById(`track-btn-${t}`);
+      if (el) el.classList.toggle('playing', trackIdx === t);
+    });
+  }
+
+  function updateAudioPlayback() {
+    const box = document.getElementById('playback-box');
+    const trackIdx = getCurrentTrack();
+    
+    if (trackIdx === 0) {
+      stopMusic();
+      box.className = 'playback-status-box';
+      box.innerHTML = isPowered
+        ? '&gt; ESTADO: El plato está girando. Arrastrá el brazo fonocaptor hacia la <b>LÍNEA ROJA</b> del vinilo.'
+        : '&gt; ESTADO: Tocadiscos apagado. Encendé el equipo y arrastrá el brazo sobre el vinilo.';
+      return;
+    }
+
+    if (!isPowered) {
+      stopMusic();
+      box.className = 'playback-status-box';
+      if (trackIdx === 2) {
+        box.innerHTML = '&gt; ⚠️ <b>¡PÚA SOBRE LA LÍNEA ROJA (ILARIÉ)!</b> Pero el equipo está apagado. Presioná <b>[ POWER: ON ]</b> para reproducir.';
+      } else {
+        box.innerHTML = '&gt; ESTADO: La púa está en el disco, pero el tocadiscos está apagado. Presioná [ POWER: ON ].';
+      }
+      return;
+    }
+
+    const trData = TRACKS[trackIdx];
+    box.className = 'playback-status-box active';
+
+    if (trackIdx >= 1 && trackIdx <= 3) {
+      playTrackMusic(trackIdx, currentSpeed);
+    } else {
+      stopMusic();
+    }
+
+    if (currentSpeed === 33) {
+      box.innerHTML = trData.text33;
+      if (trData.target) {
+        unlockModule();
+      }
+    } else {
+      box.innerHTML = trData.text45;
+    }
+  }
+
+  function unlockModule() {
+    if (!solved) {
+      playChime();
+    }
+    solved = true;
+    localStorage.setItem('er_vinilo', SECRET_CODE);
+  }
+
+  // ── DRAG & DROP TONEARM INTERACTION ────────────────────────
+  let isDraggingArm = false;
+
+  function getPivotCenter() {
+    const base = document.querySelector('.tonearm-base');
+    const rect = base.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function calcAngleFromPoint(clientX, clientY) {
+    const pivot = getPivotCenter();
+    const dx = clientX - pivot.x;
+    const dy = clientY - pivot.y;
+    let rad = Math.atan2(-dx, dy);
+    let deg = rad * (180 / Math.PI);
+    return Math.max(0, Math.min(65, deg));
+  }
+
+  function onArmStart(e) {
+    isDraggingArm = true;
+    const p = e.touches ? e.touches[0] : e;
+    setArmAngle(calcAngleFromPoint(p.clientX, p.clientY));
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onArmMove(e) {
+    if (!isDraggingArm) return;
+    const p = e.touches ? e.touches[0] : e;
+    setArmAngle(calcAngleFromPoint(p.clientX, p.clientY));
+  }
+
+  function onArmEnd() {
+    if (!isDraggingArm) return;
+    isDraggingArm = false;
+    // Si la aguja cae en la zona del surco rojo (Pista 2), centrar en 49° justo sobre la línea roja
+    const track = getCurrentTrack();
+    if (track === 2) {
+      setArmAngle(49);
+    }
+  }
+
+  const armAssembly = document.getElementById('tonearm-assembly');
+  armAssembly.addEventListener('mousedown', onArmStart);
+  armAssembly.addEventListener('touchstart', onArmStart, { passive: false });
+  document.addEventListener('mousemove', onArmMove);
+  document.addEventListener('touchmove', onArmMove, { passive: false });
+  document.addEventListener('mouseup', onArmEnd);
+  document.addEventListener('touchend', onArmEnd);
+
+  // ── Hint Penalty & Reveal System ────────────────────────
+  function playPenaltySound() {
+    try {
+      const ctx = getAudioCtx();
+      [220, 180, 140].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.19);
+      });
+    } catch(e) {}
+  }
+
+  function requestUnlockHint() {
+    document.getElementById('hint-confirm-overlay').style.display = 'flex';
+  }
+
+  function closeHintConfirm() {
+    document.getElementById('hint-confirm-overlay').style.display = 'none';
+  }
+
+  function applyHintPenalty() {
+    closeHintConfirm();
+    playPenaltySound();
+
+    // Sumar 5 minutos de penalización al cronómetro general
+    let st = parseInt(localStorage.getItem('er_start_time') || Date.now(), 10);
+    st -= (5 * 60 * 1000); // Mover inicio 5 min al pasado
+    localStorage.setItem('er_start_time', st.toString());
+    localStorage.setItem('er_vinilo_hint_used', '1');
+
+    revealHintUI(true);
+  }
+
+  function openVinylHistoryModal() {
+    const m = document.getElementById('vinyl-history-modal');
+    if (m) m.style.display = 'flex';
+  }
+
+  function closeVinylHistoryModal() {
+    const m = document.getElementById('vinyl-history-modal');
+    if (m) m.style.display = 'none';
+  }
+
+  function revealHintUI(animate) {
+    const locked = document.getElementById('hint-locked-box');
+    const revealed = document.getElementById('hint-revealed-box');
+    if (locked) locked.style.display = 'none';
+    if (revealed) {
+      revealed.style.display = 'block';
+      if (animate) {
+        revealed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }
+
+  // Keyboard support for hint modal and history modal
+  document.addEventListener('keydown', e => {
+    const modal = document.getElementById('hint-confirm-overlay');
+    if (modal && modal.style.display === 'flex') {
+      if (e.key.toUpperCase() === 'S' || e.key.toUpperCase() === 'Y' || e.key === 'Enter') {
+        e.preventDefault();
+        applyHintPenalty();
+        return;
+      } else if (e.key.toUpperCase() === 'N' || e.key === 'Escape') {
+        e.preventDefault();
+        closeHintConfirm();
+        return;
+      }
+    }
+
+    const historyModal = document.getElementById('vinyl-history-modal');
+    if (historyModal && historyModal.style.display === 'flex') {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        closeVinylHistoryModal();
+        return;
+      }
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────────
+  if (localStorage.getItem('er_vinilo_hint_used') === '1') {
+    revealHintUI(false);
+  }
+
+  if (localStorage.getItem('er_vinilo')) {
+    solved = true;
+  }
+</script>
+</body>
+</html>

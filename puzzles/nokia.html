@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nokia 1100 — Módulo SMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'VT323', monospace;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    /* Page header */
+    .page-top {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .page-top-title {
+      font-size: 1.3rem;
+      letter-spacing: .15em;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+    }
+
+    /* Layout: phone + clue side by side */
+    .main-layout {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    /* ── NOKIA PHONE ── */
+    .nokia-phone {
+      width: 220px;
+      background: linear-gradient(160deg, #c8c5c0 0%, #9e9b96 40%, #7a7874 100%);
+      border-radius: 18px 18px 28px 28px;
+      padding: 16px 14px 24px;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        inset 0 -4px 8px rgba(0,0,0,0.3),
+        0 8px 30px rgba(0,0,0,0.7),
+        0 2px 6px rgba(0,0,0,0.5);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Nokia brand */
+    .nokia-brand {
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #4a4845;
+      letter-spacing: .25em;
+      margin-bottom: 8px;
+    }
+
+    /* LCD Screen */
+    .nokia-screen-frame {
+      background: #3a3a3a;
+      border-radius: 6px;
+      padding: 5px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+      margin-bottom: 10px;
+    }
+    .nokia-screen {
+      background: #8baa6c;
+      border-radius: 3px;
+      width: 100%;
+      height: 94px;
+      padding: 6px 8px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      text-align: left;
+    }
+    /* LCD pixel grid texture */
+    .nokia-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px),
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px);
+      pointer-events: none;
+    }
+
+    .nokia-screen-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.52rem;
+      color: #2a3a20;
+      height: 12px;
+      margin-bottom: 2px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .nokia-msg-label {
+      font-size: 0.52rem;
+      color: #2a3a20;
+      height: 12px;
+      margin-bottom: 2px;
+      line-height: 1;
+      text-align: left;
+      flex-shrink: 0;
+    }
+
+    .nokia-text-display {
+      flex: 1;
+      font-size: 0.96rem;
+      color: #1a2a10;
+      line-height: 1.25;
+      text-align: left;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      letter-spacing: .02em;
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    .nokia-cursor {
+      display: inline-block;
+      width: 6px;
+      height: 0.9em;
+      background: #1a2a10;
+      vertical-align: middle;
+      animation: blink .7s step-end infinite;
+      margin-left: 1px;
+    }
+
+    .nokia-screen-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.52rem;
+      color: #2a3a20;
+      height: 12px;
+      line-height: 1;
+      flex-shrink: 0;
+      border-top: 1px dashed rgba(42, 58, 32, 0.3);
+      padding-top: 2px;
+      margin-top: 2px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .nokia-send-cue {
+      font-weight: bold;
+      color: #1a2a10;
+      letter-spacing: .04em;
+    }
+
+    .nokia-char-count {
+      text-align: right;
+      font-size: 0.5rem;
+      color: #2a3a20;
+    }
+
+    /* Soft keys area */
+    .nokia-softkeys {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0 6px;
+      gap: 4px;
+    }
+    .soft-key {
+      background: linear-gradient(180deg, #b0ada8 0%, #888580 100%);
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 0.55rem;
+      font-family: 'Share Tech Mono', monospace;
+      color: #2a2825;
+      cursor: pointer;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.3);
+      transition: all .1s;
+    }
+    .soft-key:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+
+    /* D-pad / OK button */
+    .nokia-dpad {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0;
+    }
+    .ok-btn {
+      background: linear-gradient(135deg, #b5b2ad 0%, #7a7874 100%);
+      border: none;
+      border-radius: 50%;
+      width: 46px;
+      height: 46px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: bold;
+      color: #2a2825;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+      transition: all .1s;
+    }
+    .ok-btn:active { transform: scale(.96); }
+
+    /* Numeric keypad */
+    .nokia-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .n-key {
+      background: linear-gradient(180deg, #c8c5bf 0%, #8e8b86 100%);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 4px 5px;
+      cursor: pointer;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+      transition: all .1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-height: 48px;
+      justify-content: center;
+    }
+    .n-key:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .n-key-letters {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.64rem;
+      font-weight: bold;
+      color: #11100e;
+      letter-spacing: .08em;
+      line-height: 1.1;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    }
+    .n-key-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.05rem;
+      color: #3a3630;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    /* Call / End keys */
+    .call-key {
+      background: linear-gradient(180deg, #5cb85c 0%, #3a7a3a 100%);
+      border-radius: 6px;
+    }
+    .call-key .n-key-num { color: #fff; font-size: .75rem; }
+
+    .end-key {
+      background: linear-gradient(180deg, #c0392b 0%, #8a2820 100%);
+      border-radius: 6px;
+    }
+    .end-key .n-key-num { color: #fff; font-size: .75rem; }
+
+    /* ── CLUE PANEL ── */
+    .clue-panel {
+      max-width: 320px;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .clue-note {
+      background: #f5e6a0;
+      padding: 14px 16px;
+      border-radius: 2px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.1);
+      transform: rotate(-1.5deg);
+      font-family: 'Share Tech Mono', monospace;
+      color: #2a2010;
+      position: relative;
+    }
+    .clue-note::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: 50%;
+      transform: translateX(-50%);
+      width: 28px; height: 16px;
+      background: rgba(255,230,50,0.7);
+      border-radius: 2px;
+    }
+    .clue-note h3 {
+      font-size: 0.7rem;
+      margin-bottom: 6px;
+      letter-spacing: .08em;
+      border-bottom: 1px solid #c0a060;
+      padding-bottom: 4px;
+    }
+    .clue-note p {
+      font-size: 0.74rem;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .clue-word {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #8b2500;
+      display: block;
+      margin: 6px 0;
+      letter-spacing: .12em;
+      text-align: center;
+      text-decoration: underline;
+    }
+
+    .instructions {
+      background: rgba(51,255,85,.04);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      max-width: 320px;
+      flex: 1;
+      min-width: 240px;
+    }
+    .instructions h4 {
+      font-size: 1rem;
+      letter-spacing: .1em;
+      margin-bottom: 10px;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+    }
+    .instructions p {
+      font-size: .95rem;
+      color: var(--green-dim);
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+    .instructions .t9-hint {
+      font-size: .85rem;
+      color: #3a5a3a;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    /* Code reveal */
+    .code-reveal {
+      display: none;
+      text-align: center;
+      padding: 20px 30px;
+      border: 1px solid var(--amber);
+      background: rgba(255,184,0,.05);
+      animation: pulseAmber 1.5s infinite alternate;
+      max-width: 300px;
+    }
+    .code-reveal.show { display: block; }
+    .code-reveal h3 {
+      font-size: 1.1rem;
+      color: var(--amber);
+      letter-spacing: .15em;
+      text-shadow: 0 0 10px var(--amber);
+      margin-bottom: 8px;
+    }
+    .code-reveal .code-digits {
+      font-size: 3.5rem;
+      color: var(--amber);
+      text-shadow: 0 0 25px var(--amber), 0 0 5px var(--amber);
+      letter-spacing: .5em;
+    }
+    @keyframes pulseAmber {
+      from { box-shadow: 0 0 10px rgba(255,184,0,.2); }
+      to   { box-shadow: 0 0 30px rgba(255,184,0,.45); }
+    }
+
+    .feedback-msg {
+      font-size: 1rem;
+      color: var(--green-dim);
+      text-align: center;
+      min-height: 1.5em;
+    }
+    .feedback-msg.ok  { color: var(--green); text-shadow: 0 0 8px var(--green); }
+    .feedback-msg.err { color: var(--red); text-shadow: 0 0 8px var(--red); }
+
+    /* ── Hint Box & Penalty UI ── */
+    .hint-container {
+      background: rgba(255, 184, 0, 0.04);
+      border: 1px solid var(--amber-dim);
+      border-radius: 6px;
+      padding: 12px 16px;
+      box-shadow: 0 0 12px rgba(255, 184, 0, 0.1);
+    }
+    .hint-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 6px var(--amber);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .penalty-warning-badge {
+      background: rgba(255, 60, 60, 0.12);
+      border: 1px dashed #ff5544;
+      color: #ff9988;
+      font-size: 0.76rem;
+      line-height: 1.4;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .btn-unlock-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 7px 12px;
+      width: 100%;
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 184, 0, 0.25);
+      transition: all 0.15s;
+    }
+    .btn-unlock-hint:hover {
+      background: var(--amber);
+      color: #000;
+      box-shadow: 0 0 16px var(--amber);
+    }
+    .penalty-applied-badge {
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: bold;
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      text-align: center;
+      animation: pulseAmber 1s infinite alternate;
+    }
+
+    /* Modal confirmation for hint */
+    .hint-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 10, 0, 0.85);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .hint-confirm-box {
+      background: #051a08;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 25px rgba(255, 184, 0, 0.4);
+      border-radius: 6px;
+      max-width: 380px;
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .hint-confirm-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+    }
+    .btn-hint-act {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-hint-yes {
+      background: rgba(255, 60, 60, 0.2);
+      border: 1px solid #ff4444;
+      color: #ff8888;
+    }
+    .btn-hint-yes:hover {
+      background: #ff4444;
+      color: #000;
+    }
+    .btn-hint-no {
+      background: rgba(51, 255, 85, 0.1);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+    .btn-hint-no:hover {
+      background: var(--green);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page header -->
+  <div class="page-top">
+    <div class="page-top-title glow">📱 MÓDULO 1 — NOKIA SMS</div>
+    <a href="../index.html" class="btn-back">◄ PANEL CENTRAL</a>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+
+    <!-- NOKIA PHONE -->
+    <div class="nokia-phone" id="nokia-phone">
+      <div class="nokia-brand">NOKIA</div>
+
+      <div class="nokia-screen-frame">
+        <div class="nokia-screen">
+          <div class="nokia-screen-top-bar">
+            <span>📶📶📶</span>
+            <span>✉ SMS</span>
+            <span>🔋</span>
+          </div>
+          <div class="nokia-msg-label">Nuevo mensaje:</div>
+          <div class="nokia-text-display" id="nokia-display"><span id="nokia-text"></span><span class="nokia-cursor" id="nokia-cur"></span></div>
+          <div class="nokia-screen-bottom-bar">
+            <span class="nokia-send-cue">Enviar [OK]</span>
+            <span class="nokia-char-count" id="char-count">0/160</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Soft keys -->
+      <div class="nokia-softkeys">
+        <button class="soft-key" onclick="pressSoftLeft()">Opciones</button>
+        <button class="n-key call-key" style="width:36px;height:36px;padding:4px" onclick="clearAll()">
+          <span class="n-key-num" style="font-size:.7rem">CLR</span>
+        </button>
+        <button class="soft-key" onclick="pressSoftRight()">Atrás</button>
+      </div>
+
+      <!-- D-pad / OK Send button -->
+      <div class="nokia-dpad">
+        <button class="ok-btn" onclick="sendSms()" title="Enviar SMS">OK</button>
+      </div>
+
+      <!-- Keypad -->
+      <div class="nokia-keypad">
+        <button class="n-key" onclick="pressKey('1')">
+          <span class="n-key-letters">. , ? !</span>
+          <span class="n-key-num">1</span>
+        </button>
+        <button class="n-key" onclick="pressKey('2')">
+          <span class="n-key-letters">A B C</span>
+          <span class="n-key-num">2</span>
+        </button>
+        <button class="n-key" onclick="pressKey('3')">
+          <span class="n-key-letters">D E F</span>
+          <span class="n-key-num">3</span>
+        </button>
+        <button class="n-key" onclick="pressKey('4')">
+          <span class="n-key-letters">G H I</span>
+          <span class="n-key-num">4</span>
+        </button>
+        <button class="n-key" onclick="pressKey('5')">
+          <span class="n-key-letters">J K L</span>
+          <span class="n-key-num">5</span>
+        </button>
+        <button class="n-key" onclick="pressKey('6')">
+          <span class="n-key-letters">M N O</span>
+          <span class="n-key-num">6</span>
+        </button>
+        <button class="n-key" onclick="pressKey('7')">
+          <span class="n-key-letters">P Q R S</span>
+          <span class="n-key-num">7</span>
+        </button>
+        <button class="n-key" onclick="pressKey('8')">
+          <span class="n-key-letters">T U V</span>
+          <span class="n-key-num">8</span>
+        </button>
+        <button class="n-key" onclick="pressKey('9')">
+          <span class="n-key-letters">W X Y Z</span>
+          <span class="n-key-num">9</span>
+        </button>
+        <button class="n-key" style="background:linear-gradient(180deg,#aaa 0%,#777 100%);" onclick="pressKey('*')">
+          <span class="n-key-num" style="font-size:1.2rem">*</span>
+        </button>
+        <button class="n-key" onclick="pressKey('0')">
+          <span class="n-key-letters">ESPACIO</span>
+          <span class="n-key-num">0</span>
+        </button>
+        <button class="n-key" style="background:linear-gradient(180deg,#aaa 0%,#777 100%);" onclick="backspace()">
+          <span class="n-key-num" style="font-size:.85rem">⌫</span>
+        </button>
+      </div>
+
+    </div><!-- /nokia-phone -->
+
+    <!-- RIGHT COLUMN: clue + instructions + code -->
+    <div style="display:flex;flex-direction:column;gap:14px;flex:1;min-width:240px;max-width:340px;">
+
+      <!-- Clue Note -->
+      <div class="clue-note">
+        <h3>📝 NOTA ENCONTRADA EN EL COLEGIO:</h3>
+        <p>
+          "Para activar el módem central, enviá un mensaje de texto SMS con el nombre de nuestra institución:"
+        </p>
+        <span class="clue-word" style="font-size:1rem;letter-spacing:.12em">COLEGIO PAULO FREIRE</span>
+        <p style="font-size:.7rem;color:#6a5030;margin-top:8px">
+          (Presioná varias veces cada tecla numérica para ciclar letras. El [0] es espacio. Luego presioná [OK] para enviar.)
+        </p>
+      </div>
+
+      <!-- Guinness World Record & History Button -->
+      <button type="button" class="btn-unlock-hint" onclick="openNokiaHistoryModal()" style="background:rgba(0,168,255,0.12);border:1px solid #00a8ff;color:#70d6ff;box-shadow:0 0 10px rgba(0,168,255,0.2);margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span>🏆</span>
+        <span>VER FOTO Y RÉCORD GUINNESS DEL NOKIA 1100</span>
+      </button>
+
+      <!-- Hint System Box -->
+      <div class="hint-container" id="hint-container">
+        <div class="hint-header">
+          <span>💡 PISTA: MAPA DEL TECLADO T9</span>
+        </div>
+
+        <!-- Locked hint view -->
+        <div class="hint-locked-box" id="hint-locked-box">
+          <p style="font-size:0.8rem;color:#e8a040;line-height:1.4">
+            ¿No recordás la distribución de letras de los celulares de la época?
+          </p>
+          <div class="penalty-warning-badge">
+            ⚠️ <b>PENALIZACIÓN:</b> Revelar el mapa T9 sumará <b>+5 MINUTOS</b> al tiempo total de escape.
+          </div>
+          <button class="btn-unlock-hint" onclick="requestUnlockHint()">
+            [ 🔓 VER MAPA T9 (+5 MIN) ]
+          </button>
+        </div>
+
+        <!-- Revealed T9 reference -->
+        <div class="hint-revealed-box" id="hint-revealed-box" style="display:none;">
+          <div class="penalty-applied-badge">
+            ⏱️ ¡PENALIZACIÓN: +5 MINUTOS SUMADOS AL CRONÓMETRO!
+          </div>
+          <div class="instructions" style="background:transparent;border:none;padding:0;max-width:100%;">
+            <h4 style="font-size:0.88rem;margin-bottom:4px">▶ MÉTODO T9</h4>
+            <p style="font-size:.8rem;line-height:1.35;margin-bottom:4px">Presioná la tecla varias veces para ciclar entre sus letras:</p>
+            <div class="t9-hint" style="font-size:.82rem;line-height:1.55;color:#99e699">
+              2→A B C &nbsp;|&nbsp; 3→D E F<br>
+              4→G H I &nbsp;|&nbsp; 5→J K L<br>
+              6→M N O &nbsp;|&nbsp; 7→P Q R S<br>
+              8→T U V &nbsp;|&nbsp; 9→W X Y Z<br>
+              0→<b>ESPACIO</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback-msg" id="feedback"></div>
+
+      <!-- Code reveal -->
+      <div class="code-reveal" id="code-reveal">
+        <h3>✓ SMS ENVIADO — CÓDIGO DESBLOQUEADO</h3>
+        <div class="code-digits">472</div>
+        <p style="font-size:.9rem;color:var(--green-dim);margin-top:8px">Anota este código en el panel central</p>
+      </div>
+
+    </div>
+
+  </div><!-- /main-layout -->
+
+  <!-- ══ MODAL HISTORIA & RÉCORD GUINNESS NOKIA 1100 ══ -->
+  <div class="hint-confirm-overlay" id="nokia-history-modal" style="display:none;z-index:1100;">
+    <div class="hint-confirm-box" style="max-width:520px;border-color:#00a8ff;box-shadow:0 0 35px rgba(0,168,255,0.45);text-align:left;background:#061017;padding:18px 22px;">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a384c;padding-bottom:8px;margin-bottom:12px;">
+        <div style="font-size:1.05rem;font-weight:bold;color:#70d6ff;display:flex;align-items:center;gap:6px;">
+          <span>🏆</span>
+          <span>NOKIA 1100 — RÉCORD GUINNESS MUNDIAL</span>
+        </div>
+        <button type="button" onclick="closeNokiaHistoryModal()" style="background:transparent;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;font-weight:bold;">✕</button>
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="text-align:center;flex-shrink:0;margin:0 auto;">
+          <img src="../assets/images/nokia_1100.jpg" alt="Nokia 1100 Original" style="width:145px;height:145px;object-fit:cover;border-radius:6px;border:2px solid #00a8ff;box-shadow:0 0 16px rgba(0,168,255,0.35);display:block;">
+          <span style="font-size:0.68rem;color:#88aacc;margin-top:4px;display:block;">Nokia 1100 (2003)</span>
+        </div>
+
+        <div style="flex:1;min-width:220px;font-size:0.82rem;line-height:1.45;color:#c0d8ea;">
+          <div style="background:rgba(0,168,255,0.1);border-left:3px solid #00a8ff;padding:5px 8px;margin-bottom:8px;font-weight:bold;color:#70d6ff;">
+            🥇 El dispositivo electrónico más vendido de toda la historia humana: +250 millones de unidades.
+          </div>
+          <p style="margin-bottom:6px;">
+            • <b>Récord Imbatible:</b> Lanzado a finales de 2003, superó en ventas a la PlayStation 2, al Game Boy y a cualquier modelo de iPhone.
+          </p>
+          <p style="margin-bottom:6px;">
+            • <b>Indestructible:</b> Famoso por su teclado de silicona monobloque resistente al polvo, su linterna frontal y una batería que duraba más de 7 días.
+          </p>
+          <p>
+            • <b>Ícono Popular:</b> Conquistó el mundo con su juego de la viborita (<i>Snake II</i>) y su legendaria durabilidad a prueba de golpes.
+          </p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;border-top:1px solid #1a384c;padding-top:10px;">
+        <button type="button" class="btn-hint-act btn-hint-no" style="background:#00a8ff;color:#000;border:none;font-weight:bold;padding:6px 24px;" onclick="closeNokiaHistoryModal()">
+          [ ENTENDIDO / CERRAR ]
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal confirmation for hint -->
+  <div class="hint-confirm-overlay" id="hint-confirm-overlay" style="display:none;">
+    <div class="hint-confirm-box">
+      <div class="hint-confirm-title">⚠️ SOLICITAR PISTA T9</div>
+      <p style="font-size:0.86rem;color:#ffd080;line-height:1.4;margin:12px 0;">
+        ¿Deseas desbloquear el mapa del teclado?<br>
+        Se sumarán <b>5 minutos de penalización</b> inmediatamente al cronómetro total de escape.
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+        <button class="btn-hint-act btn-hint-yes" onclick="applyHintPenalty()">[ SÍ, APLICAR +5 MIN ]</button>
+        <button class="btn-hint-act btn-hint-no" onclick="closeHintConfirm()">[ CANCELAR ]</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ── T9 Data ──────────────────────────────────────────────
+  const t9Map = {
+    '1': ['.', ',', '?', '!', '-'],
+    '2': ['A', 'B', 'C'],
+    '3': ['D', 'E', 'F'],
+    '4': ['G', 'H', 'I'],
+    '5': ['J', 'K', 'L'],
+    '6': ['M', 'N', 'O'],
+    '7': ['P', 'Q', 'R', 'S'],
+    '8': ['T', 'U', 'V'],
+    '9': ['W', 'X', 'Y', 'Z'],
+    '0': [' ']
+  };
+
+  const TARGET = 'COLEGIO PAULO FREIRE';
+  const SECRET_CODE = '472';
+
+  let confirmed   = '';
+  let pendingKey  = null;
+  let pendingIdx  = 0;
+  let autoTimer   = null;
+  let solved      = false;
+
+  // ── UI helpers ───────────────────────────────────────────
+  function updateDisplay() {
+    const textEl  = document.getElementById('nokia-text');
+    const curEl   = document.getElementById('nokia-cur');
+    const cntEl   = document.getElementById('char-count');
+
+    const pending = pendingKey ? t9Map[pendingKey][pendingIdx] : '';
+    const fullText = confirmed + pending;
+
+    textEl.textContent = fullText;
+    curEl.style.display = fullText.length >= 160 ? 'none' : 'inline-block';
+    cntEl.textContent   = `${fullText.length}/160`;
+  }
+
+  function showFeedback(msg, cls = '') {
+    const el = document.getElementById('feedback');
+    el.textContent = msg;
+    el.className   = 'feedback-msg ' + cls;
+  }
+
+  // ── Nokia Audio Engine (Web Audio API) ────────────────────
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  // Clásico bip de teclado Nokia 1100 (1050 Hz)
+  function playNokiaKeyBeep() {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1050, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    } catch(e) {}
+  }
+
+  // Bip de borrado / retroceso
+  function playNokiaDeleteBeep() {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(750, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.07, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.045);
+    } catch(e) {}
+  }
+
+  // Tono especial clásico de Nokia SMS recibido/enviado (... -- ...)
+  function playNokiaSmsTone() {
+    try {
+      const ctx = getAudioCtx();
+      const notes = [
+        { t: 0.00, d: 0.04, f: 1800 },
+        { t: 0.08, d: 0.04, f: 1800 },
+        { t: 0.16, d: 0.04, f: 1800 },
+        { t: 0.28, d: 0.12, f: 1800 },
+        { t: 0.44, d: 0.12, f: 1800 },
+        { t: 0.60, d: 0.04, f: 1800 },
+        { t: 0.68, d: 0.04, f: 1800 },
+        { t: 0.76, d: 0.04, f: 1800 }
+      ];
+
+      notes.forEach(n => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(n.f, ctx.currentTime + n.t);
+
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + n.t + n.d);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(ctx.currentTime + n.t);
+        osc.stop(ctx.currentTime + n.t + n.d + 0.01);
+      });
+    } catch(e) {}
+  }
+
+  // ── T9 logic ─────────────────────────────────────────────
+  function pressKey(key) {
+    if (solved) return;
+    if (!(key in t9Map)) return;
+    
+    // Sonido clásico de tecla Nokia
+    playNokiaKeyBeep();
+
+    // Evitar espacios en blanco al inicio del mensaje vacío
+    if (key === '0' && confirmed.length === 0 && pendingKey === null) return;
+    if ((confirmed + (pendingKey ? t9Map[pendingKey][pendingIdx] : '')).length >= 160) return;
+
+    clearTimeout(autoTimer);
+
+    if (key === pendingKey) {
+      // Cycle through letters for same key
+      pendingIdx = (pendingIdx + 1) % t9Map[key].length;
+    } else {
+      // New key → commit pending letter first
+      if (pendingKey !== null) {
+        confirmed += t9Map[pendingKey][pendingIdx];
+      }
+      pendingKey = key;
+      pendingIdx = 0;
+    }
+
+    updateDisplay();
+    showFeedback(`Tecla [${key}] → seleccionando: ${t9Map[key][pendingIdx]}`);
+
+    // Auto-confirm after 1.5 s
+    autoTimer = setTimeout(commitLetter, 1500);
+  }
+
+  function commitLetter() {
+    if (pendingKey === null) return;
+    confirmed += t9Map[pendingKey][pendingIdx];
+    pendingKey  = null;
+    pendingIdx  = 0;
+    clearTimeout(autoTimer);
+    updateDisplay();
+    showFeedback('');
+  }
+
+  function confirmLetter() {
+    commitLetter();
+  }
+
+  // ── Botón OK para Enviar el SMS ───────────────────────────
+  function sendSms() {
+    if (solved) return;
+    commitLetter();
+
+    const text = confirmed.trim().toUpperCase();
+
+    if (text === TARGET) {
+      solved = true;
+      clearTimeout(autoTimer);
+
+      // Reproducir tono clásico de SMS Nokia
+      playNokiaSmsTone();
+
+      // Animate screen
+      const screen = document.querySelector('.nokia-screen');
+      screen.style.background = '#a8d080';
+
+      showFeedback('¡ MENSAJE ENVIADO A DIRECCIÓN ! ✓', 'ok');
+
+      setTimeout(() => {
+        // Save to localStorage
+        localStorage.setItem('er_nokia', SECRET_CODE);
+
+        // Show code reveal
+        const cr = document.getElementById('code-reveal');
+        cr.classList.add('show');
+        cr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 500);
+    } else if (text.length === 0) {
+      playNokiaDeleteBeep();
+      showFeedback('El mensaje está vacío. Escribí el texto antes de presionar OK.');
+    } else {
+      playNokiaDeleteBeep();
+      showFeedback(`Texto incorrecto: "${text}". Debe decir exactamente "${TARGET}".`);
+    }
+  }
+
+  function backspace() {
+    if (solved) return;
+    playNokiaDeleteBeep();
+    clearTimeout(autoTimer);
+    if (pendingKey !== null) {
+      pendingKey = null;
+      pendingIdx = 0;
+    } else {
+      confirmed = confirmed.slice(0, -1);
+    }
+    updateDisplay();
+    showFeedback('');
+  }
+
+  function clearAll() {
+    if (solved) return;
+    playNokiaDeleteBeep();
+    clearTimeout(autoTimer);
+    confirmed  = '';
+    pendingKey = null;
+    pendingIdx = 0;
+    updateDisplay();
+    showFeedback('');
+  }
+
+  function pressSoftLeft() { sendSms(); }
+  function pressSoftRight() { backspace(); }
+
+  // ── Hint Penalty & Reveal System ────────────────────────
+  function playPenaltySound() {
+    try {
+      const ctx = getAudioCtx();
+      [220, 180, 140].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.19);
+      });
+    } catch(e) {}
+  }
+
+  function requestUnlockHint() {
+    document.getElementById('hint-confirm-overlay').style.display = 'flex';
+  }
+
+  function closeHintConfirm() {
+    document.getElementById('hint-confirm-overlay').style.display = 'none';
+  }
+
+  function applyHintPenalty() {
+    closeHintConfirm();
+    playPenaltySound();
+
+    // Sumar 5 minutos de penalización al cronómetro general
+    let st = parseInt(localStorage.getItem('er_start_time') || Date.now(), 10);
+    st -= (5 * 60 * 1000); // Mover el inicio 5 min al pasado incrementa 5 min el tiempo transcurrido
+    localStorage.setItem('er_start_time', st.toString());
+    localStorage.setItem('er_nokia_hint_used', '1');
+
+    revealHintUI(true);
+  }
+
+  function openNokiaHistoryModal() {
+    const m = document.getElementById('nokia-history-modal');
+    if (m) m.style.display = 'flex';
+  }
+
+  function closeNokiaHistoryModal() {
+    const m = document.getElementById('nokia-history-modal');
+    if (m) m.style.display = 'none';
+  }
+
+  function revealHintUI(animate) {
+    const locked = document.getElementById('hint-locked-box');
+    const revealed = document.getElementById('hint-revealed-box');
+    if (locked) locked.style.display = 'none';
+    if (revealed) {
+      revealed.style.display = 'block';
+      if (animate) {
+        revealed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }
+
+  // ── Keyboard support (Teclado físico) ────────────────────
+  document.addEventListener('keydown', e => {
+    // Si el diálogo de confirmación de pista está abierto
+    const modal = document.getElementById('hint-confirm-overlay');
+    if (modal && modal.style.display === 'flex') {
+      if (e.key.toUpperCase() === 'S' || e.key.toUpperCase() === 'Y' || e.key === 'Enter') {
+        e.preventDefault();
+        applyHintPenalty();
+        return;
+      }
+      if (e.key.toUpperCase() === 'N' || e.key === 'Escape') {
+        e.preventDefault();
+        closeHintConfirm();
+        return;
+      }
+      return;
+    }
+
+    // Si el modal de historia del Nokia 1100 está abierto
+    const historyModal = document.getElementById('nokia-history-modal');
+    if (historyModal && historyModal.style.display === 'flex') {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        closeNokiaHistoryModal();
+        return;
+      }
+    }
+
+    if (solved) return;
+    if (e.key >= '0' && e.key <= '9') {
+      pressKey(e.key);
+    } else if (e.key === 'Backspace' || e.key === 'Delete') {
+      backspace();
+    } else if (e.key === 'Enter') {
+      sendSms();
+    } else if (e.key === ' ' || e.code === 'Space') {
+      pressKey('0');
+    }
+  });
+
+  // ── Init ─────────────────────────────────────────────────
+  (function init() {
+    updateDisplay();
+
+    // Check if hint was already unlocked
+    if (localStorage.getItem('er_nokia_hint_used') === '1') {
+      revealHintUI(false);
+    }
+
+    // Check if already solved
+    if (localStorage.getItem('er_nokia')) {
+      solved = true;
+      confirmed = TARGET;
+      updateDisplay();
+      document.getElementById('code-reveal').classList.add('show');
+      showFeedback('¡Módulo ya completado! ✓', 'ok');
+    }
+  })();
+</script>
+</body>
+</html>

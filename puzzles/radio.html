@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo 6 — Radio a Perilla | Escape Room</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    body {
+      background: #060906;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      user-select: none;
+    }
+
+    .page-top {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .page-top-title {
+      font-size: 1.4rem;
+      letter-spacing: .12em;
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 920px;
+    }
+
+    /* ── VINTAGE RADIO CHASSIS ── */
+    .radio-cabinet {
+      width: 480px;
+      background: linear-gradient(135deg, #442a18 0%, #2b180d 50%, #1a0d06 100%);
+      border-radius: 18px;
+      padding: 24px 22px 28px;
+      border: 4px solid #1a0e07;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.25),
+        inset 0 -6px 12px rgba(0,0,0,0.9),
+        0 20px 50px rgba(0,0,0,0.9),
+        0 0 0 1px #6b4423;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Radio Top Handle & Trim */
+    .radio-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #5a381d;
+      padding-bottom: 8px;
+    }
+    .radio-brand {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: .25em;
+      color: #d4a76a;
+      text-shadow: 0 1px 2px #000;
+      font-weight: bold;
+    }
+    .radio-band-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: #a88152;
+      background: #190e06;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #4a2c14;
+    }
+
+    /* ── HORIZONTAL TUNING DIAL SCALE ── */
+    .dial-window {
+      background: #0d120a;
+      border: 3px solid #2d1c10;
+      border-radius: 8px;
+      padding: 14px 18px 12px;
+      box-shadow:
+        inset 0 3px 10px rgba(0,0,0,0.9),
+        0 2px 4px rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .dial-window::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255,220,130,0.15), transparent 75%);
+      pointer-events: none;
+    }
+
+    /* Scale Tracks */
+    .scale-row {
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin: 8px 0;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .scale-label {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #e5b364;
+      width: 36px;
+      letter-spacing: .05em;
+      flex-shrink: 0;
+    }
+    .scale-ticks-wrap {
+      flex: 1;
+      position: relative;
+      height: 22px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    .scale-num {
+      position: absolute;
+      transform: translateX(-50%);
+      font-size: 0.68rem;
+      color: #a3b899;
+      top: 2px;
+      z-index: 2;
+    }
+    .scale-num.target-freq {
+      color: #ffcc55;
+      font-weight: bold;
+      font-size: 0.78rem;
+      text-shadow: 0 0 6px rgba(255,200,80,0.6);
+    }
+
+    /* Glass Dial Needle (Red Aguja) - Aligns 1:1 with scale-ticks-wrap */
+    .needle-container {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 64px; /* 18px pad + 36px label + 10px margin */
+      right: 28px; /* 18px pad + 10px margin */
+      pointer-events: none;
+    }
+    .tuning-needle {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: #ff2222;
+      box-shadow: 0 0 8px #ff0000, 0 0 2px #ffffff;
+      transform: translateX(-50%);
+      left: 0%; /* Driven by JS: 0% to 100% */
+      transition: left 0.04s linear;
+      z-index: 5;
+    }
+    .needle-tip {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7px;
+      height: 7px;
+      background: #ff4444;
+      border-radius: 50%;
+    }
+
+    /* ── LOWER SECTION (Speaker Grille + Controls) ── */
+    .radio-lower {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* Speaker Grille */
+    .speaker-grille {
+      flex: 1;
+      height: 150px;
+      background:
+        radial-gradient(circle, #150d08 18%, transparent 20%) 0 0 / 8px 8px,
+        linear-gradient(180deg, #2a1a0f, #150d08);
+      border-radius: 10px;
+      border: 2px solid #4a2d16;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      position: relative;
+    }
+
+    /* Tuning Signal LED */
+    .tuning-led-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.6);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid #442a16;
+    }
+    .tuning-led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #331111;
+      border: 1px solid #552222;
+      transition: all 0.2s;
+    }
+    .tuning-led.locked {
+      background: #33ff55;
+      box-shadow: 0 0 12px #33ff55, 0 0 4px #ffffff;
+      border-color: #88ffaa;
+    }
+    .tuning-led-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      color: #998066;
+      letter-spacing: .1em;
+    }
+
+    /* Controls Panel */
+    .radio-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      min-width: 150px;
+    }
+
+    /* Rotary Tuning Knob (Perilla de Sintonía con topes físicos) */
+    .knob-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .knob-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: .15em;
+      color: #d4a76a;
+      text-shadow: 0 1px 2px #000;
+    }
+    .knob-base-plate {
+      position: relative;
+      width: 98px;
+      height: 98px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rotary-knob {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #4a3c30 0%, #201812 60%, #0d0906 100%);
+      border: 3px solid #6b4d35;
+      box-shadow:
+        inset 0 3px 5px rgba(255,255,255,0.2),
+        inset 0 -4px 8px rgba(0,0,0,0.8),
+        0 8px 18px rgba(0,0,0,0.8);
+      position: relative;
+      cursor: grab;
+      user-select: none;
+      transform-origin: center center;
+    }
+    .rotary-knob:active { cursor: grabbing; }
+
+    /* Physical stop markers */
+    .stop-dot-min, .stop-dot-max {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #8b5a2b;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      border: 1px solid #4a2c14;
+    }
+    .stop-dot-min { bottom: 4px; left: 14px; }
+    .stop-dot-max { bottom: 4px; right: 14px; }
+    
+    /* Ridges / Grooves on knob */
+    .knob-notch {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 14px;
+      background: #ffb800;
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(255,184,0,0.8);
+    }
+    .knob-grip {
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.15);
+      background: radial-gradient(circle, #1a120b 40%, #2e2015 100%);
+    }
+
+    /* Vintage Toggle Lever Switch (Palanca metálica basculante AM / FM) */
+    .toggle-switch-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-switch-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: .12em;
+      color: #d4a76a;
+      text-shadow: 0 1px 2px #000;
+    }
+    .toggle-plate {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 110px;
+      background: linear-gradient(180deg, #1c1108, #0d0703);
+      border: 2px solid #5a381d;
+      border-radius: 6px;
+      padding: 4px 10px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6);
+      transition: all 0.2s;
+    }
+    .toggle-plate:hover {
+      border-color: #d4a76a;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(212,167,106,0.3);
+    }
+    .toggle-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #664422;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .toggle-text.active {
+      color: #ffcc55;
+      text-shadow: 0 0 8px rgba(255,200,80,0.7);
+    }
+    .toggle-lever-slot {
+      width: 36px;
+      height: 18px;
+      background: #000;
+      border-radius: 10px;
+      box-shadow: inset 0 2px 4px #000;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .toggle-lever-head {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d5d5d5 40%, #777777 80%, #333333 100%);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.9), inset 0 1px 2px #fff;
+      border: 1px solid #aaa;
+      transition: left 0.25s cubic-bezier(0.2, 1.3, 0.4, 1);
+      top: -1px;
+      left: 0px; /* AM */
+    }
+    .toggle-switch-unit.is-fm .toggle-lever-head {
+      left: 16px; /* FM */
+    }
+
+    /* ── RIGHT PANEL: NEWSPAPER CLUE & BROADCAST READOUT ── */
+    .right-panel {
+      max-width: 380px;
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Retro Newspaper Radio Guide */
+    .newspaper-guide {
+      background: #f3ebdb;
+      padding: 16px 18px;
+      box-shadow: 4px 4px 14px rgba(0,0,0,0.7);
+      font-family: 'Share Tech Mono', monospace;
+      color: #1e1308;
+      border-left: 5px solid #6b3e1c;
+      transform: rotate(0.5deg);
+    }
+    .newspaper-guide h3 {
+      font-size: 0.85rem;
+      letter-spacing: .08em;
+      color: #4a2408;
+      border-bottom: 1px solid #c9b195;
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .station-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(120,90,60,0.3);
+      font-size: 0.75rem;
+    }
+    .station-row.target {
+      background: #ffe3a0;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      border: 1px solid #c89524;
+      margin: 5px 0;
+      color: #4a2100;
+    }
+
+    /* Live Transmission Box */
+    .transmission-box {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.88rem;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .transmission-title {
+      font-size: 0.7rem;
+      color: var(--amber);
+      margin-bottom: 4px;
+      letter-spacing: .08em;
+    }
+    .transmission-text {
+      color: var(--green-dim);
+      line-height: 1.4;
+    }
+    .transmission-box.locked .transmission-text {
+      color: var(--green);
+      text-shadow: 0 0 6px var(--green);
+    }
+
+    /* ── Hint Box & Penalty UI ── */
+    .hint-container {
+      background: rgba(255, 184, 0, 0.04);
+      border: 1px solid var(--amber-dim);
+      border-radius: 6px;
+      padding: 12px 14px;
+      box-shadow: 0 0 12px rgba(255, 184, 0, 0.1);
+    }
+    .hint-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 6px var(--amber);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .penalty-warning-badge {
+      background: rgba(255, 60, 60, 0.12);
+      border: 1px dashed #ff5544;
+      color: #ff9988;
+      font-size: 0.76rem;
+      line-height: 1.4;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .btn-unlock-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 7px 12px;
+      width: 100%;
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 184, 0, 0.25);
+      transition: all 0.15s;
+    }
+    .btn-unlock-hint:hover {
+      background: var(--amber);
+      color: #000;
+      box-shadow: 0 0 16px var(--amber);
+    }
+    .penalty-applied-badge {
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: bold;
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-align: center;
+      animation: pulseAmber 1s infinite alternate;
+    }
+
+    /* Modal confirmation for hint */
+    .hint-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 10, 0, 0.85);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .hint-confirm-box {
+      background: #051a08;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 25px rgba(255, 184, 0, 0.4);
+      border-radius: 6px;
+      max-width: 380px;
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .hint-confirm-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+    }
+    .btn-hint-act {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-hint-yes {
+      background: rgba(255, 60, 60, 0.2);
+      border: 1px solid #ff4444;
+      color: #ff8888;
+    }
+    .btn-hint-yes:hover {
+      background: #ff4444;
+      color: #000;
+    }
+    .btn-hint-no {
+      background: rgba(51, 255, 85, 0.1);
+      border: 1px solid var(--green);
+      color: var(--green);
+    }
+    .btn-hint-no:hover {
+      background: var(--green);
+      color: #000;
+    }
+
+    @keyframes pulseAmber {
+      from { box-shadow: 0 0 10px rgba(255,184,0,.2); }
+      to   { box-shadow: 0 0 30px rgba(255,184,0,.4); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-top">
+    <div class="page-top-title glow">📻 MÓDULO 6 — RADIO A PERILLA (AM/FM)</div>
+    <a href="../index.html" class="btn-back">◄ PANEL CENTRAL</a>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- RADIO CABINET -->
+    <div class="radio-cabinet">
+      
+      <div class="radio-top-bar">
+        <span class="radio-brand">SPICA TRANSISTOR 8</span>
+        <span class="radio-band-badge" id="band-indicator">BANDA: AM (kHz)</span>
+      </div>
+
+      <!-- HORIZONTAL DIAL SCALE -->
+      <div class="dial-window">
+        <!-- FM Scale -->
+        <div class="scale-row">
+          <span class="scale-label">FM</span>
+          <div class="scale-ticks-wrap">
+            <span class="scale-num" style="left:0%">88</span>
+            <span class="scale-num" style="left:20%">92</span>
+            <span class="scale-num" style="left:40%">96</span>
+            <span class="scale-num" style="left:60%">100</span>
+            <span class="scale-num" style="left:80%">104</span>
+            <span class="scale-num" style="left:100%">108</span>
+          </div>
+        </div>
+
+        <!-- AM Scale -->
+        <div class="scale-row">
+          <span class="scale-label">AM</span>
+          <div class="scale-ticks-wrap">
+            <span class="scale-num" style="left:0%">53</span>
+            <span class="scale-num" style="left:12%">60</span>
+            <span class="scale-num" style="left:22%">70</span>
+            <span class="scale-num target-freq" style="left:36%">81</span>
+            <span class="scale-num" style="left:56%">97</span>
+            <span class="scale-num" style="left:74%">120</span>
+            <span class="scale-num" style="left:88%">140</span>
+            <span class="scale-num" style="left:100%">160</span>
+          </div>
+        </div>
+
+        <!-- Red Needle -->
+        <div class="needle-container">
+          <div class="tuning-needle" id="tuning-needle">
+            <div class="needle-tip"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOWER: Speaker + Controls -->
+      <div class="radio-lower">
+        
+        <!-- Speaker -->
+        <div class="speaker-grille">
+          <div class="tuning-led-box">
+            <div class="tuning-led" id="tuning-led"></div>
+            <span class="tuning-led-label" id="tuning-led-text">SINTONÍA</span>
+          </div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#8a6a48;margin-top:14px">
+            DYNAMIC 4Ω SPEAKER
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="radio-controls">
+          
+          <!-- Band Selector Lever (Palanca) -->
+          <div class="toggle-switch-unit is-fm" id="band-toggle" onclick="toggleBand()" title="Hacé click para accionar la palanca entre AM y FM">
+            <div class="toggle-switch-label">PALANCA DE BANDA</div>
+            <div class="toggle-plate">
+              <span class="toggle-text" id="toggle-label-am">AM</span>
+              <div class="toggle-lever-slot">
+                <div class="toggle-lever-head" id="toggle-head"></div>
+              </div>
+              <span class="toggle-text active" id="toggle-label-fm">FM</span>
+            </div>
+          </div>
+
+          <!-- Tuning Knob -->
+          <div class="knob-wrap">
+            <div class="knob-label">SINTONÍA / TUNING</div>
+            <div class="knob-base-plate">
+              <div class="stop-dot-min" title="Tope Mínimo (530 kHz / 88 MHz)"></div>
+              <div class="stop-dot-max" title="Tope Máximo (1600 kHz / 108 MHz)"></div>
+              <div class="rotary-knob" id="rotary-knob" title="Girá la perilla para mover la aguja del dial">
+                <div class="knob-grip"></div>
+                <div class="knob-notch" id="knob-notch"></div>
+              </div>
+            </div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:#d4a76a;margin-top:2px" id="freq-readout">
+              AM 530 kHz
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- Newspaper Clue -->
+      <!-- Newspaper Clue -->
+      <div class="newspaper-guide">
+        <h3>📰 GUÍA DE RADIOS — EL PAÍS (1990)</h3>
+        <div class="station-row"><span>CX 12 Radio Oriental</span><span>AM 770 kHz</span></div>
+        <div class="station-row"><span>CX 16 Radio Carve</span><span>AM 850 kHz</span></div>
+        <div class="station-row target">
+          <span>⭐ CX 14 El Espectador (Boletín Paulo Freire)</span>
+          <span><b>AM 810 kHz</b></span>
+        </div>
+        <div class="station-row"><span>Océano FM Éxitos</span><span>FM 93.9 MHz</span></div>
+        <div class="station-row"><span>Concierto FM Clásicos</span><span>FM 94.7 MHz</span></div>
+        <p style="font-size:.68rem;color:#5a3311;margin-top:8px;line-height:1.4">
+          📻 Sintonizá con precisión la frecuencia <b>AM 810</b> para escuchar la transmisión de emergencia y obtener la clave.
+        </p>
+      </div>
+
+      <!-- Transmission Box -->
+      <div class="transmission-box" id="transmission-box">
+        <div class="transmission-title" id="trans-title">&gt; SEÑAL ENTRANTE:</div>
+        <div class="transmission-text" id="trans-text">[ Estática y ruido de fondo: Shhhhhh... bzzz... ]</div>
+      </div>
+
+      <!-- Spika Radio History Button -->
+      <button type="button" class="btn-unlock-hint" onclick="openSpikaHistoryModal()" style="background:rgba(255,184,0,0.12);border:1px solid var(--amber);color:var(--amber);box-shadow:0 0 10px rgba(255,184,0,0.2);margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Share Tech Mono',monospace;font-size:0.8rem;padding:7px 10px;border-radius:4px;">
+        <span>📻</span>
+        <span>VER HISTORIA DE LA RADIO SPIKA</span>
+      </button>
+
+      <!-- Hint System Box -->
+      <div class="hint-container" id="hint-container">
+        <div class="hint-header">
+          <span>💡 PISTA: CÓMO SINTONIZAR LA RADIO</span>
+        </div>
+
+        <!-- Locked hint view -->
+        <div class="hint-locked-box" id="hint-locked-box">
+          <p style="font-size:0.8rem;color:#e8a040;line-height:1.4">
+            ¿No encontrás cómo cambiar a la emisora de noticias de emergencia?
+          </p>
+          <div class="penalty-warning-badge">
+            ⚠️ <b>PENALIZACIÓN:</b> Revelar la pista sumará <b>+5 MINUTOS</b> al tiempo total de escape.
+          </div>
+          <button class="btn-unlock-hint" onclick="requestUnlockHint()">
+            [ 🔓 VER GUÍA DE SINTONIZACIÓN (+5 MIN) ]
+          </button>
+        </div>
+
+        <!-- Revealed hint reference -->
+        <div class="hint-revealed-box" id="hint-revealed-box" style="display:none;">
+          <div class="penalty-applied-badge">
+            ⏱️ ¡PENALIZACIÓN: +5 MINUTOS SUMADOS AL CRONÓMETRO!
+          </div>
+          <div class="instructions" style="background:transparent;border:none;padding:0;">
+            <h4 style="font-size:0.88rem;margin-bottom:4px">▶ GUÍA DE SINTONIZACIÓN</h4>
+            <p style="font-size:.82rem;line-height:1.4;color:#99e699">
+              1. Accioná la palanca a la banda <b>AM</b> (hacé click en la palanca).<br>
+              2. Girá la <b>perilla de sintonía</b> hacia la izquierda hasta el <b>81</b> (frecuencia <b>810 kHz - El Espectador</b>).<br>
+              3. Al estabilizarse en 810 kHz, escucharás el boletín informativo con el código secreto.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ══ MODAL HISTORIA DE LA RADIO SPIKA ══ -->
+  <div class="hint-confirm-overlay" id="spika-history-modal" style="display:none;z-index:1100;">
+    <div class="hint-confirm-box" style="max-width:520px;border-color:var(--amber);box-shadow:0 0 35px rgba(255,184,0,0.45);text-align:left;background:#0d0a06;padding:18px 22px;">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #4a3010;padding-bottom:8px;margin-bottom:12px;">
+        <div style="font-size:1.05rem;font-weight:bold;color:var(--amber);display:flex;align-items:center;gap:6px;">
+          <span>📻</span>
+          <span>LA MÍTICA RADIO SPIKA A TRANSISTORES</span>
+        </div>
+        <button type="button" onclick="closeSpikaHistoryModal()" style="background:transparent;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;font-weight:bold;">✕</button>
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="text-align:center;flex-shrink:0;margin:0 auto;">
+          <img src="../assets/images/radio_spika.jpg" alt="Radio Spika Original" style="width:145px;height:145px;object-fit:cover;border-radius:6px;border:2px solid var(--amber);box-shadow:0 0 16px rgba(255,184,0,0.35);display:block;">
+          <span style="font-size:0.68rem;color:#d0b080;margin-top:4px;display:block;">Radio Spika (Estuche de Cuero)</span>
+        </div>
+
+        <div style="flex:1;min-width:220px;font-size:0.82rem;line-height:1.45;color:#e8d8c0;">
+          <div style="background:rgba(255,184,0,0.1);border-left:3px solid var(--amber);padding:5px 8px;margin-bottom:8px;font-weight:bold;color:var(--amber);">
+            🇺🇾 El sonido inseparable del Río de la Plata:
+          </div>
+          <p style="margin-bottom:6px;">
+            • <b>El Ícono Portátil:</b> La <b>Spika</b>, fabricada en Japón y popularizada masivamente en Uruguay y Argentina, fue la primera radio a transistores que permitió llevar las noticias y la música a todas partes con su funda de cuero marrón y correa.
+          </p>
+          <p style="margin-bottom:6px;">
+            • <b>Fútbol, Mate y Noticias:</b> Compañera inseparable del mate matutino, la tribuna de fútbol de los domingos y los informativos de El Espectador, Carve y Oriental en AM.
+          </p>
+          <p>
+            • <b>Sintonía Analógica:</b> La aguja roja y la perilla giratoria requerían precisión milimétrica para limpiar la estática entre emisoras.
+          </p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;border-top:1px solid #4a3010;padding-top:10px;">
+        <button type="button" class="btn-hint-act btn-hint-no" style="background:var(--amber);color:#000;border:none;font-weight:bold;padding:6px 24px;" onclick="closeSpikaHistoryModal()">
+          [ ENTENDIDO / CERRAR ]
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal confirmation for hint -->
+  <div class="hint-confirm-overlay" id="hint-confirm-overlay" style="display:none;">
+    <div class="hint-confirm-box">
+      <div class="hint-confirm-title">⚠️ SOLICITAR PISTA DE RADIO</div>
+      <p style="font-size:0.86rem;color:#ffd080;line-height:1.4;margin:12px 0;">
+        ¿Deseas desbloquear la guía para sintonizar la radio?<br>
+        Se sumarán <b>5 minutos de penalización</b> inmediatamente al cronómetro total de escape.
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
+        <button class="btn-hint-act btn-hint-yes" onclick="applyHintPenalty()">[ SÍ, APLICAR +5 MIN ]</button>
+        <button class="btn-hint-act btn-hint-no" onclick="closeHintConfirm()">[ CANCELAR ]</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const SECRET_CODE = '749';
+
+  // AM Range: 530 kHz to 1600 kHz
+  // Target: AM 810 kHz (CX 14 El Espectador)
+  // FM Range: 88.0 MHz to 108.0 MHz
+
+  let currentBand = 'FM'; // Inicia en FM por defecto
+  let dialProgress = 0.295; // Inicia alrededor de 93.9 MHz (Océano FM)
+  let knobAngle = 0;
+  let solved = false;
+
+  // Stations Definitions
+  const STATIONS = [
+    {
+      band: 'AM',
+      freq: 770,
+      name: 'CX 12 Radio Oriental',
+      text: '📻 <i>"...en esta tarde de tango y fútbol por CX 12 Radio Oriental..."</i>'
+    },
+    {
+      band: 'AM',
+      freq: 810, // TARGET
+      name: 'CX 14 El Espectador',
+      target: true,
+      text: '🗣️ <b>BOLETÍN URGENTE (CX 14 El Espectador):</b> <i>"Atención familias del Colegio Paulo Freire, el código de escape maestro es <b>749</b>. Repetimos: siete, cuatro, nueve."</i>'
+    },
+    {
+      band: 'AM',
+      freq: 850,
+      name: 'CX 16 Radio Carve',
+      text: '📻 <i>"...informa el servicio informativo de Radio Carve, el campo y la ciudad unidos..."</i>'
+    },
+    {
+      band: 'FM',
+      freq: 93.9,
+      name: 'Océano FM',
+      text: '📻 <i>"♫ Océano FM 93.9... los grandes éxitos pop & rock de los 80s..."</i>'
+    },
+    {
+      band: 'FM',
+      freq: 94.7,
+      name: 'Concierto FM',
+      text: '📻 <i>"♫ Concierto FM 94.7... la mejor música de los 80 y 90..."</i>'
+    }
+  ];
+
+  // Calibración precisa para sincronizar la aguja roja con los números impresos en AM
+  const AM_CALIBRATION = [
+    [0.00, 530],
+    [0.12, 600],
+    [0.22, 700],
+    [0.31, 770],
+    [0.36, 810], // TARGET: 810 kHz cae exactamente sobre '81' (36%)
+    [0.42, 850],
+    [0.56, 970],
+    [0.74, 1200],
+    [0.88, 1400],
+    [1.00, 1600]
+  ];
+
+  // ── Web Audio Synthesizer for Radio Stations & Static ───
+  let audioCtx = null;
+  let staticNoiseNode = null;
+  let staticGainNode = null;
+  let currentMusicInterval = null;
+  let currentStationName = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function initRadioStatic() {
+    try {
+      const ctx = getAudioCtx();
+      if (staticNoiseNode) return;
+
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      staticNoiseNode = ctx.createBufferSource();
+      staticNoiseNode.buffer = noiseBuffer;
+      staticNoiseNode.loop = true;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1600;
+      filter.Q.value = 1.0;
+
+      staticGainNode = ctx.createGain();
+      staticGainNode.gain.setValueAtTime(0.04, ctx.currentTime);
+
+      staticNoiseNode.connect(filter);
+      filter.connect(staticGainNode);
+      staticGainNode.connect(ctx.destination);
+
+      staticNoiseNode.start(0);
+    } catch(e) {}
+  }
+
+  function setStaticVolume(vol) {
+    try {
+      initRadioStatic();
+      if (staticGainNode && audioCtx) {
+        staticGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        staticGainNode.gain.setValueAtTime(staticGainNode.gain.value, audioCtx.currentTime);
+        staticGainNode.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.1);
+      }
+    } catch(e) {}
+  }
+
+  let lastTunedFreq = null;
+
+  function speakRadioBroadcast(station) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const tempEl = document.createElement('div');
+      tempEl.innerHTML = station.text;
+      const spokenText = (tempEl.textContent || tempEl.innerText || '').replace(/[\r\n]+/g, ' ').trim();
+
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.lang = 'es-UY';
+      utterance.rate = 0.95;
+      utterance.pitch = 0.98;
+
+      const voices = window.speechSynthesis.getVoices();
+      const esVoice = voices.find(v => v.lang && (v.lang.startsWith('es-UY') || v.lang.startsWith('es-AR') || v.lang.startsWith('es')));
+      if (esVoice) utterance.voice = esVoice;
+
+      window.speechSynthesis.speak(utterance);
+    } catch(e) {}
+  }
+
+  function stopMusic() {
+    if (currentMusicInterval) {
+      clearInterval(currentMusicInterval);
+      currentMusicInterval = null;
+    }
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch(e) {}
+    }
+    currentStationName = null;
+    lastTunedFreq = null;
+  }
+
+  function playTone(freq, duration, type='sine', gainVal=0.07, delay=0) {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(gainVal, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration - 0.02);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration);
+    } catch(e) {}
+  }
+
+  function playStationAudio(station) {
+    if (lastTunedFreq === station.freq) return;
+    stopMusic();
+    lastTunedFreq = station.freq;
+    currentStationName = station.name;
+    setStaticVolume(0.003); // Bajar estática al sintonizar
+
+    // Disparar locución hablada en tiempo real de la transmisión
+    speakRadioBroadcast(station);
+
+    if (station.freq === 93.9) {
+      // 🌊 Océano FM: Melodía Synthpop 80s (Take on Me riff)
+      const notes = [
+        {f: 440, d: 0.14}, {f: 440, d: 0.14}, {f: 329.63, d: 0.14}, {f: 261.63, d: 0.14},
+        {f: 293.66, d: 0.14}, {f: 349.23, d: 0.14}, {f: 392.00, d: 0.22}, {f: 440, d: 0.3}
+      ];
+      function playOceano() {
+        notes.forEach((n, idx) => {
+          playTone(n.f, n.d, 'sawtooth', 0.05, idx * 0.16);
+        });
+      }
+      playOceano();
+      currentMusicInterval = setInterval(playOceano, 1600);
+
+    } else if (station.freq === 94.7) {
+      // 🎶 Concierto FM: Balada Clásica 80s (Synth bells suaves)
+      const notes = [
+        {f: 523.25, d: 0.3}, {f: 659.25, d: 0.3}, {f: 783.99, d: 0.4}, {f: 1046.5, d: 0.5},
+        {f: 880.00, d: 0.35}, {f: 783.99, d: 0.35}, {f: 659.25, d: 0.6}
+      ];
+      function playConcierto() {
+        notes.forEach((n, idx) => {
+          playTone(n.f, n.d, 'triangle', 0.08, idx * 0.32);
+        });
+      }
+      playConcierto();
+      currentMusicInterval = setInterval(playConcierto, 2800);
+
+    } else if (station.freq === 770) {
+      // 🎻 Radio Oriental AM 770: Tango clásico (Arpegio porteño)
+      const notes = [
+        {f: 220, d: 0.2}, {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 440, d: 0.4},
+        {f: 415.30, d: 0.25}, {f: 440, d: 0.45}
+      ];
+      function playTango() {
+        notes.forEach((n, idx) => {
+          playTone(n.f, n.d, 'square', 0.04, idx * 0.26);
+        });
+      }
+      playTango();
+      currentMusicInterval = setInterval(playTango, 2200);
+
+    } else if (station.freq === 850) {
+      // 📢 Radio Carve AM 850: Noticiero / Intervalo radial clásico
+      const notes = [
+        {f: 392.00, d: 0.2}, {f: 440.00, d: 0.2}, {f: 523.25, d: 0.3}, {f: 392.00, d: 0.4}
+      ];
+      function playCarve() {
+        notes.forEach((n, idx) => {
+          playTone(n.f, n.d, 'triangle', 0.06, idx * 0.28);
+        });
+      }
+      playCarve();
+      currentMusicInterval = setInterval(playCarve, 2000);
+
+    } else if (station.freq === 810) {
+      // 🚨 CX 14 El Espectador (Target): Fanfarria informativa urgente
+      const notes = [
+        {f: 587.33, d: 0.12}, {f: 587.33, d: 0.12}, {f: 587.33, d: 0.12}, {f: 783.99, d: 0.5},
+        {f: 659.25, d: 0.2}, {f: 783.99, d: 0.6}
+      ];
+      notes.forEach((n, idx) => {
+        playTone(n.f, n.d, 'sawtooth', 0.07, idx * 0.18);
+      });
+    }
+  }
+
+  function getFrequency() {
+    if (currentBand === 'AM') {
+      for (let i = 0; i < AM_CALIBRATION.length - 1; i++) {
+        const [p1, f1] = AM_CALIBRATION[i];
+        const [p2, f2] = AM_CALIBRATION[i + 1];
+        if (dialProgress >= p1 && dialProgress <= p2) {
+          const ratio = (dialProgress - p1) / (p2 - p1);
+          return Math.round(f1 + ratio * (f2 - f1));
+        }
+      }
+      return dialProgress >= 1.0 ? 1600 : 530;
+    } else {
+      // FM: 88.0 a 108.0 MHz
+      return (88.0 + dialProgress * (108.0 - 88.0)).toFixed(1);
+    }
+  }
+
+  function toggleBand() {
+    getAudioCtx();
+    const next = currentBand === 'AM' ? 'FM' : 'AM';
+    setBand(next);
+  }
+
+  function setBand(band) {
+    currentBand = band;
+    const unit = document.getElementById('band-toggle');
+    const lblAm = document.getElementById('toggle-label-am');
+    const lblFm = document.getElementById('toggle-label-fm');
+    
+    if (unit) {
+      unit.classList.toggle('is-fm', band === 'FM');
+      unit.classList.toggle('is-am', band === 'AM');
+    }
+    if (lblAm && lblFm) {
+      lblAm.classList.toggle('active', band === 'AM');
+      lblFm.classList.toggle('active', band === 'FM');
+    }
+
+    const badge = document.getElementById('band-indicator');
+    if (badge) badge.textContent = `BANDA: ${band} (${band === 'AM' ? 'kHz' : 'MHz'})`;
+
+    updateDialUI();
+    checkTuning();
+  }
+
+  // ── ROTARY KNOB & DIAL TUNING (Con Topes Físicos de -135° a +135°) ────
+  const MIN_KNOB_ANGLE = -135; // Tope izquierdo
+  const MAX_KNOB_ANGLE = 135;  // Tope derecho
+  const TOTAL_ARC      = MAX_KNOB_ANGLE - MIN_KNOB_ANGLE; // Arco total de 270°
+
+  function updateDialUI() {
+    const needle = document.getElementById('tuning-needle');
+    const readout = document.getElementById('freq-readout');
+    const f = getFrequency();
+
+    // Posición de la aguja en la escala (0% a 100%)
+    needle.style.left = (dialProgress * 100) + '%';
+    readout.textContent = `${currentBand} ${f} ${currentBand === 'AM' ? 'kHz' : 'MHz'}`;
+
+    // Posición de la perilla con topes mecánicos estrictos
+    knobAngle = MIN_KNOB_ANGLE + dialProgress * TOTAL_ARC;
+    knob.style.transform = `rotate(${knobAngle}deg)`;
+  }
+
+  function checkTuning() {
+    const f = parseFloat(getFrequency());
+    const transBox = document.getElementById('transmission-box');
+    const transTitle = document.getElementById('trans-title');
+    const transText = document.getElementById('trans-text');
+    const led = document.getElementById('tuning-led');
+    const ledText = document.getElementById('tuning-led-text');
+
+    let matched = null;
+
+    STATIONS.forEach(st => {
+      if (st.band === currentBand) {
+        const diff = Math.abs(f - st.freq);
+        const tolerance = currentBand === 'AM' ? 12 : 0.35;
+        if (diff <= tolerance) {
+          matched = st;
+        }
+      }
+    });
+
+    if (matched) {
+      led.classList.add('locked');
+      ledText.textContent = 'SINTONIZADO';
+      ledText.style.color = 'var(--green)';
+      transBox.classList.add('locked');
+      transTitle.textContent = `> ${matched.name.toUpperCase()}:`;
+      transText.innerHTML = matched.text;
+
+      playStationAudio(matched);
+
+      if (matched.target && !solved) {
+        unlockModule();
+      }
+    } else {
+      led.classList.remove('locked');
+      ledText.textContent = 'SINTONÍA';
+      ledText.style.color = '#998066';
+      transBox.classList.remove('locked');
+      transTitle.textContent = '> SEÑAL ENTRANTE:';
+      transText.textContent = '[ Estática y ruido de fondo: Shhhhhh... bzzzz... ]';
+
+      stopMusic();
+      setStaticVolume(0.045);
+    }
+  }
+
+  function unlockModule() {
+    solved = true;
+    localStorage.setItem('er_radio', SECRET_CODE);
+  }
+
+  // ── Interacción con la Perilla ──
+  const knob = document.getElementById('rotary-knob');
+  let isDragging = false;
+  let prevY = 0;
+  let prevAngle = 0;
+
+  function getCenter() {
+    const rect = knob.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function getPointerAngle(clientX, clientY) {
+    const c = getCenter();
+    return Math.atan2(clientY - c.y, clientX - c.x) * (180 / Math.PI);
+  }
+
+  function onKnobDown(e) {
+    getAudioCtx();
+    isDragging = true;
+    const p = e.touches ? e.touches[0] : e;
+    prevY = p.clientY;
+    prevAngle = getPointerAngle(p.clientX, p.clientY);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    
+    // Seguimiento angular polar
+    const curAngle = getPointerAngle(p.clientX, p.clientY);
+    let delta = curAngle - prevAngle;
+    if (delta < -180) delta += 360;
+    if (delta > 180)  delta -= 360;
+    prevAngle = curAngle;
+
+    const deltaY = prevY - p.clientY;
+    prevY = p.clientY;
+
+    let step = (delta / TOTAL_ARC);
+    if (Math.abs(delta) < 0.2 && Math.abs(deltaY) > 1) {
+      step = (deltaY * 0.005);
+    }
+
+    // dialProgress CLAMPED estrictamente a [0.0, 1.0] -> la perilla frena en los topes
+    dialProgress = Math.max(0, Math.min(1.0, dialProgress + step));
+
+    updateDialUI();
+    checkTuning();
+  }
+
+  function onPointerUp() {
+    isDragging = false;
+  }
+
+  knob.addEventListener('mousedown', onKnobDown);
+  knob.addEventListener('touchstart', onKnobDown, { passive: false });
+  document.addEventListener('mousemove', onPointerMove);
+  document.addEventListener('touchmove', onPointerMove, { passive: false });
+  document.addEventListener('mouseup', onPointerUp);
+  document.addEventListener('touchend', onPointerUp);
+
+  // Rueda del ratón sobre la perilla
+  knob.addEventListener('wheel', e => {
+    getAudioCtx();
+    e.preventDefault();
+    const step = (e.deltaY < 0 ? 0.015 : -0.015);
+    dialProgress = Math.max(0, Math.min(1.0, dialProgress + step));
+    updateDialUI();
+    checkTuning();
+  }, { passive: false });
+
+  document.addEventListener('pointerdown', () => {
+    getAudioCtx();
+    initRadioStatic();
+  }, { once: true });
+
+  // ── Hint Penalty & Reveal System ────────────────────────
+  function playPenaltySound() {
+    try {
+      const ctx = getAudioCtx();
+      [220, 180, 140].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.12);
+        osc.stop(ctx.currentTime + i * 0.12 + 0.19);
+      });
+    } catch(e) {}
+  }
+
+  function requestUnlockHint() {
+    document.getElementById('hint-confirm-overlay').style.display = 'flex';
+  }
+
+  function closeHintConfirm() {
+    document.getElementById('hint-confirm-overlay').style.display = 'none';
+  }
+
+  function applyHintPenalty() {
+    closeHintConfirm();
+    playPenaltySound();
+
+    // Sumar 5 minutos de penalización al cronómetro general
+    let st = parseInt(localStorage.getItem('er_start_time') || Date.now(), 10);
+    st -= (5 * 60 * 1000); // Mover inicio 5 min al pasado
+    localStorage.setItem('er_start_time', st.toString());
+    localStorage.setItem('er_radio_hint_used', '1');
+
+    revealHintUI(true);
+  }
+
+  function openSpikaHistoryModal() {
+    const m = document.getElementById('spika-history-modal');
+    if (m) m.style.display = 'flex';
+  }
+
+  function closeSpikaHistoryModal() {
+    const m = document.getElementById('spika-history-modal');
+    if (m) m.style.display = 'none';
+  }
+
+  function revealHintUI(animate) {
+    const locked = document.getElementById('hint-locked-box');
+    const revealed = document.getElementById('hint-revealed-box');
+    if (locked) locked.style.display = 'none';
+    if (revealed) {
+      revealed.style.display = 'block';
+      if (animate) {
+        revealed.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }
+
+  // Keyboard support for hint modal and history modal
+  document.addEventListener('keydown', e => {
+    const modal = document.getElementById('hint-confirm-overlay');
+    if (modal && modal.style.display === 'flex') {
+      if (e.key.toUpperCase() === 'S' || e.key.toUpperCase() === 'Y' || e.key === 'Enter') {
+        e.preventDefault();
+        applyHintPenalty();
+        return;
+      } else if (e.key.toUpperCase() === 'N' || e.key === 'Escape') {
+        e.preventDefault();
+        closeHintConfirm();
+        return;
+      }
+    }
+
+    const historyModal = document.getElementById('spika-history-modal');
+    if (historyModal && historyModal.style.display === 'flex') {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        closeSpikaHistoryModal();
+        return;
+      }
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────────
+  if (localStorage.getItem('er_radio_hint_used') === '1') {
+    revealHintUI(false);
+  }
+
+  if (localStorage.getItem('er_radio')) {
+    solved = true;
+    dialProgress = 0.36; // Exactamente sobre el 81 (810 kHz)
+    setBand('AM');
+  } else {
+    dialProgress = 0.295; // 93.9 MHz en FM (Océano FM)
+    setBand('FM'); // Comienza en FM por defecto
+  }
+</script>
+</body>
+</html>

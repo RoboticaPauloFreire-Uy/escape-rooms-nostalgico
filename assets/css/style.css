@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --green:        #33ff55;
+  --green-bright: #88ffaa;
+  --green-dim:    #1a6e2a;
+  --green-dark:   #071a0c;
+  --amber:        #ffb800;
+  --amber-dim:    #996e00;
+  --red:          #ff3333;
+  --bg:           #040704;
+  --panel-bg:     #070d07;
+  --border:       #1a4d1a;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #000;
+  min-height: 100vh;
+  font-family: 'VT323', monospace;
+  color: var(--green);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── SCANLINES overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.13) 3px, rgba(0,0,0,0.13) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── CRT vignette ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%,
+    transparent 55%, rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ── Console wrapper ── */
+.console-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--panel-bg);
+  padding: 32px 44px 40px;
+  animation: screenFlicker 12s infinite;
+}
+
+@keyframes screenFlicker {
+  0%,100%   { opacity: 1; }
+  91%       { opacity: 1; }
+  92%       { opacity: .94; }
+  93%       { opacity: 1; }
+  97%       { opacity: 1; }
+  97.5%     { opacity: .97; }
+  98%       { opacity: 1; }
+}
+
+/* ── Typography helpers ── */
+.glow        { text-shadow: 0 0 10px var(--green), 0 0 3px var(--green); }
+.glow-amber  { text-shadow: 0 0 10px var(--amber),  0 0 3px var(--amber); }
+.glow-red    { text-shadow: 0 0 10px var(--red),    0 0 3px var(--red); }
+
+/* ── Blink ── */
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+.blink { animation: blink 1s step-end infinite; }
+
+/* ── Divider ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--green-dim);
+  margin: 18px 0;
+  opacity: .5;
+}
+
+/* ── Back button (shared) ── */
+.btn-back {
+  display: inline-block;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  color: var(--green-dim);
+  text-decoration: none;
+  letter-spacing: .1em;
+  border: 1px solid var(--green-dim);
+  padding: 4px 14px;
+  transition: all .2s;
+  cursor: pointer;
+}
+.btn-back:hover {
+  color: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(51,255,85,.25);
+}
+
+/* ── Puzzle page base ── */
+.puzzle-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background: var(--panel-bg);
+  gap: 20px;
+}
+
+.puzzle-page-header {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.puzzle-page-title {
+  font-size: 1.5rem;
+  letter-spacing: .15em;
+  text-shadow: 0 0 10px var(--green);
+  flex: 1;
+}
+
+/* ── Code reveal box ── */
+.code-reveal {
+  display: none;
+  text-align: center;
+  padding: 20px 30px;
+  border: 1px solid var(--amber);
+  background: rgba(255,184,0,.05);
+  animation: pulseAmber 1.5s infinite alternate;
+  max-width: 400px;
+}
+.code-reveal.show { display: block; }
+.code-reveal h3 {
+  font-size: 1.1rem;
+  color: var(--amber);
+  letter-spacing: .15em;
+  text-shadow: 0 0 10px var(--amber);
+  margin-bottom: 8px;
+}
+.code-reveal .code-digits {
+  font-size: 3rem;
+  color: var(--amber);
+  text-shadow: 0 0 20px var(--amber), 0 0 5px var(--amber);
+  letter-spacing: .4em;
+}
+
+@keyframes pulseAmber {
+  from { box-shadow: 0 0 10px rgba(255,184,0,.2); }
+  to   { box-shadow: 0 0 25px rgba(255,184,0,.4); }
+}

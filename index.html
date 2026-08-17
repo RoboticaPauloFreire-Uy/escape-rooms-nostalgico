@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Room Nostálgico — Computadora 1980s</title>
+  <meta name="description" content="Escape room nostálgico. Panel de control central en computadora de los 80s con monitor de fósforo verde, disquetera y teclado retro.">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body {
+      background: #020402;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 10px 30px;
+    }
+
+    /* ── COMPACT WORKSTATION WRAPPER ── */
+    .pc-workstation {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* ── BEIGE CRT MONITOR (1980s PC) ── */
+    .crt-monitor-frame {
+      width: 100%;
+      background: linear-gradient(180deg, #d8cbaf 0%, #c4b595 60%, #a89776 100%);
+      border-radius: 20px 20px 14px 14px;
+      padding: 16px 20px 14px;
+      border: 4px solid #8e7e60;
+      box-shadow:
+        inset 0 3px 5px rgba(255,255,255,0.4),
+        inset 0 -5px 10px rgba(0,0,0,0.5),
+        0 15px 40px rgba(0,0,0,0.95),
+        0 0 0 2px #5a4f3c;
+      position: relative;
+    }
+
+    /* Top vents & manufacturer badge */
+    .monitor-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 0 6px;
+    }
+    .monitor-brand-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: .2em;
+      color: #4a3e2e;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+      background: #bdae8f;
+      padding: 2px 10px;
+      border-radius: 3px;
+      border: 1px solid #7d6e53;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .monitor-vents { display: flex; gap: 4px; }
+    .vent-slot {
+      width: 20px;
+      height: 3px;
+      background: #6e5f47;
+      border-radius: 2px;
+    }
+
+    /* Screen surface curvature & phosphor green */
+    .screen-surface {
+      background: radial-gradient(circle at 50% 45%, #0d2812 0%, #06180a 70%, #030d05 100%);
+      border-radius: 18px;
+      border: 1px solid #1a441e;
+      padding: 16px 20px;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.85), 0 0 15px rgba(51,255,85,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── NO DISK PHOSPHOR GREEN SCREEN ── */
+    .screen-no-disk-ui {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      min-height: 290px;
+      padding: 16px;
+      color: var(--green);
+      font-family: 'Share Tech Mono', monospace;
+      animation: screenFlicker 8s infinite;
+      cursor: pointer;
+      user-select: none;
+    }
+    .no-disk-glitch-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--green-bright);
+      text-shadow: 0 0 10px var(--green);
+      margin-bottom: 10px;
+      letter-spacing: .06em;
+    }
+    .insert-disk-badge {
+      border: 2px dashed var(--green);
+      background: rgba(51, 255, 85, 0.08);
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin: 14px 0;
+      color: var(--green-bright);
+      box-shadow: 0 0 15px rgba(51, 255, 85, 0.2);
+    }
+
+
+
+    .crt-screen-bezel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 15%, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Monitor Lower Controls */
+    .monitor-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+    .monitor-hardware-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pc-hw-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      background: linear-gradient(180deg, #d8ceba 0%, #b8ab95 100%);
+      border: 1px solid #7d6f58;
+      border-bottom: 2px solid #4a3e2e;
+      border-radius: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: bold;
+      color: #3b2e1e;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4);
+      transition: all 0.08s ease;
+      user-select: none;
+    }
+    .pc-hw-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .pc-hw-btn.off {
+      background: linear-gradient(180deg, #8a8274 0%, #686054 100%);
+      color: #333;
+    }
+    .pc-hw-reset {
+      border-color: #995544;
+    }
+    .reset-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff4433;
+      box-shadow: 0 0 4px #ff2211;
+    }
+    .monitor-power-led {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #33ff55;
+      box-shadow: 0 0 8px #33ff55, 0 0 2px #ffffff;
+      transition: all 0.2s;
+    }
+    .monitor-power-led.off {
+      background: #222222;
+      box-shadow: none;
+      border: 1px solid #111;
+    }
+    .screen-surface.powered-off {
+      background: #000000 !important;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.95) !important;
+    }
+    .screen-surface.powered-off * {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* ── CRT RESET CONFIRMATION OVERLAY ── */
+    .crt-reset-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 15, 5, 0.9);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+      animation: fadeInOverlay 0.2s ease;
+    }
+    /* ── FULL SCREEN CRT MODAL OVERLAY ── */
+    .crt-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 10, 4, 0.92);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+      animation: fadeInOverlay 0.2s ease;
+    }
+    .crt-reset-box {
+      background: #021a08;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 24px rgba(255, 184, 0, 0.4), inset 0 0 20px rgba(0, 255, 80, 0.15);
+      border-radius: 6px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+    }
+    .crt-reset-header {
+      background: var(--amber);
+      color: #000;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 5px 10px;
+      letter-spacing: .08em;
+    }
+    .crt-reset-body {
+      padding: 18px 20px;
+    }
+    .crt-reset-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .btn-crt-confirm {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 7px 14px;
+      background: rgba(255, 60, 60, 0.15);
+      border: 1px solid #ff4444;
+      color: #ff7777;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(255, 60, 60, 0.3);
+      transition: all 0.15s;
+    }
+    .btn-crt-confirm:hover {
+      background: #ff4444;
+      color: #000;
+      box-shadow: 0 0 14px #ff4444;
+    }
+    .btn-crt-cancel {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 7px 14px;
+      background: rgba(51, 255, 85, 0.1);
+      border: 1px solid var(--green);
+      color: var(--green);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(51, 255, 85, 0.3);
+      transition: all 0.15s;
+    }
+    .btn-crt-cancel:hover {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 14px var(--green);
+    }
+
+    /* ── SCREEN INTERNALS ── */
+    .screen-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--green-dim);
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+    .screen-title {
+      font-size: 1.15rem;
+      letter-spacing: .15em;
+      text-shadow: 0 0 8px var(--green);
+    }
+    .screen-status-badge {
+      font-size: 0.85rem;
+      color: var(--amber);
+      text-shadow: 0 0 6px var(--amber);
+    }
+
+    /* ── MISSION TABS BAR (1 A LA VEZ) ── */
+    .mission-tabs-bar {
+      display: flex;
+      gap: 6px;
+      margin: 10px 0 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .mission-tab-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+      color: var(--green-dim);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .mission-tab-btn:hover {
+      color: var(--green);
+      border-color: var(--green-dim);
+      background: rgba(51,255,85,0.08);
+    }
+    .mission-tab-btn.active {
+      border-color: var(--green);
+      color: #000;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+      font-weight: bold;
+    }
+    .mission-tab-btn.solved {
+      border-color: var(--green-dim);
+      color: var(--green);
+    }
+    .mission-tab-btn.active.solved {
+      color: #000;
+      background: var(--green);
+    }
+    .mission-tab-btn.tab-final {
+      border-color: var(--amber-dim);
+      color: var(--amber-dim);
+    }
+    .mission-tab-btn.tab-final.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-style: dashed;
+      color: #665533;
+      border-color: #443322;
+      background: rgba(0,0,0,0.4);
+    }
+    .mission-tab-btn.tab-final.ready {
+      border-color: var(--amber);
+      color: var(--amber);
+      animation: pulseAmber 1s infinite alternate;
+      cursor: pointer;
+      opacity: 1;
+    }
+    .mission-tab-btn.tab-final.active {
+      background: var(--amber);
+      color: #000;
+      border-color: var(--amber);
+      box-shadow: 0 0 10px var(--amber);
+    }
+
+    /* ── ACTIVE SINGLE MISSION CARD ── */
+    .active-mission-card {
+      background: rgba(51,255,85,0.03);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+    .m-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .m-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .m-icon { font-size: 1.8rem; line-height: 1; }
+    .m-title {
+      font-size: 1.25rem;
+      letter-spacing: .12em;
+      text-shadow: 0 0 8px var(--green);
+    }
+    .m-idx-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--amber);
+      background: rgba(255,184,0,0.1);
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid var(--amber-dim);
+    }
+
+    .m-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      border-top: 1px dashed rgba(51,255,85,0.2);
+      padding-top: 8px;
+    }
+
+    .m-hint-text {
+      font-size: 0.95rem;
+      color: var(--green-bright);
+      line-height: 1.4;
+      background: rgba(0,0,0,0.4);
+      padding: 8px 12px;
+      border-left: 3px solid var(--green-dim);
+    }
+
+    .m-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .btn-nav {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--green-dim);
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-nav:hover {
+      color: var(--green);
+      border-color: var(--green-dim);
+    }
+    .btn-enter-mission {
+      background: rgba(51,255,85,0.12);
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: 'VT323', monospace;
+      font-size: 1.15rem;
+      padding: 5px 20px;
+      text-decoration: none;
+      letter-spacing: .1em;
+      border-radius: 3px;
+      transition: all 0.2s;
+      text-shadow: 0 0 6px var(--green);
+    }
+    .btn-enter-mission:hover {
+      background: var(--green);
+      color: #000;
+      box-shadow: 0 0 14px var(--green);
+    }
+
+    /* ── FINAL ESCAPE CONTAINER (QUESTION SCREEN) ── */
+    .final-escape-box {
+      display: none;
+      background: rgba(255,184,0,0.04);
+      border: 1px solid var(--amber);
+      border-radius: 6px;
+      padding: 16px 20px;
+      animation: pulseAmber 2s infinite alternate;
+    }
+
+    /* ── TABLERO DE FAMILIAS QUE ESCAPARON ── */
+    .families-board-box {
+      display: none;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      padding: 12px 14px;
+      height: 100%;
+      min-height: 255px;
+      overflow-y: auto;
+      max-height: 310px;
+      box-shadow: inset 0 0 20px rgba(0,255,80,0.08);
+    }
+    .families-board-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .families-board-title {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .families-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px;
+      padding: 8px 4px 14px;
+      justify-items: center;
+    }
+    .family-polaroid {
+      background: #fdfbf7;
+      border: 1px solid #d8cfbe;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 0 8px rgba(255,255,255,0.8);
+      padding: 6px 6px 10px;
+      width: 100%;
+      max-width: 135px;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .family-polaroid:nth-child(even) { transform: rotate(1.5deg); }
+    .family-polaroid:nth-child(odd) { transform: rotate(-1.5deg); }
+    .family-polaroid:nth-child(3n) { transform: rotate(2deg); }
+    .family-polaroid:hover {
+      transform: scale(1.06) rotate(0deg) !important;
+      z-index: 10;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.9);
+    }
+    .family-photo-frame {
+      width: 100%;
+      height: 100px;
+      background: #241e17;
+      overflow: hidden;
+      border-radius: 2px;
+      border: 1px solid #c7bca7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .family-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .family-name-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-top: 5px;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .family-date-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      color: #665544;
+      margin-top: 2px;
+    }
+    .family-delete-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #ff4444;
+      color: white;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .family-polaroid:hover .family-delete-btn {
+      opacity: 1;
+    }
+    .final-escape-title {
+      font-size: 1.25rem;
+      color: var(--amber);
+      text-shadow: 0 0 10px var(--amber);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .final-question-text {
+      font-size: 1.05rem;
+      color: #ffd875;
+      line-height: 1.45;
+      margin: 8px 0;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 12px;
+      border-left: 4px solid var(--amber);
+    }
+    .console-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .prompt-sym { font-size: 1.2rem; color: var(--green); font-weight: bold; }
+    .escape-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--amber-dim);
+      font-family: 'VT323', monospace;
+      font-size: 1.35rem;
+      color: var(--amber);
+      letter-spacing: .12em;
+      padding: 2px 6px;
+      outline: none;
+      text-shadow: 0 0 8px var(--amber);
+    }
+    .escape-input:focus { border-bottom-color: var(--amber); }
+    .btn-execute {
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      background: transparent;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 4px 16px;
+      letter-spacing: .1em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-execute:hover:not(:disabled) {
+      background: var(--amber);
+      color: #000;
+      box-shadow: 0 0 14px var(--amber);
+    }
+    .btn-execute:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      border-color: var(--amber-dim);
+      color: var(--amber-dim);
+    }
+    .escape-message {
+      font-size: 0.95rem;
+      margin-top: 6px;
+      min-height: 1.2em;
+    }
+    .escape-message.error { color: var(--red); text-shadow: 0 0 8px var(--red); }
+
+    /* ── FLOPPY DISK DRIVE UNIT ── */
+    .floppy-drive-unit {
+      width: 100%;
+      background: linear-gradient(180deg, #c9bb9d, #b3a484);
+      border-radius: 10px;
+      padding: 10px 18px;
+      border: 3px solid #7d6e53;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.3),
+        inset 0 -3px 6px rgba(0,0,0,0.4),
+        0 8px 20px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .floppy-drive-left { display: flex; align-items: center; gap: 12px; }
+    .floppy-slot-container {
+      width: 190px;
+      height: 24px;
+      background: #110e0a;
+      border-radius: 4px;
+      border: 2px solid #5a4b38;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+    .floppy-disk {
+      width: 110px;
+      height: 14px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.55rem;
+      color: #fff;
+      position: absolute;
+      left: 6px;
+      transition: all 0.4s cubic-bezier(0.2, 1.2, 0.4, 1);
+    }
+    .floppy-disk.inserted {
+      left: 45px;
+      background: #0a200a;
+      border-color: #33ff55;
+      color: #88ffaa;
+    }
+    .floppy-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3a2211;
+      border: 1px solid #663311;
+    }
+    .floppy-led.reading {
+      background: #ffb800;
+      box-shadow: 0 0 8px #ffb800;
+    }
+
+    /* ── RETRO MECHANICAL KEYBOARD ── */
+    .retro-keyboard {
+      width: 100%;
+      background: linear-gradient(180deg, #d3c5a6 0%, #beae8f 60%, #9e8e70 100%);
+      border-radius: 12px 12px 8px 8px;
+      padding: 12px 14px 14px;
+      border: 3px solid #7a6a4f;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        0 10px 25px rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .keyboard-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: .15em;
+      color: #4a3e2e;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .keyboard-row {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+    .v-key {
+      height: 32px;
+      min-width: 32px;
+      padding: 0 6px;
+      background: linear-gradient(180deg, #f0e6d2 0%, #dfd4be 40%, #c9bd9f 100%);
+      border-radius: 3px;
+      border: 1px solid #9c8e73;
+      border-bottom: 2px solid #6b5f48;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #2b2216;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.06s;
+    }
+    .v-key:active, .v-key.pressed {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+      background: #cfc3a6;
+    }
+    .v-key.wide-key { min-width: 52px; font-size: 0.68rem; }
+    .v-key.enter-key {
+      min-width: 64px;
+      background: linear-gradient(180deg, #b8dfb8, #8fbf8f);
+      border-color: #558855;
+      color: #113311;
+    }
+    .v-key.space-key { flex: 1; max-width: 220px; }
+  </style>
+</head>
+<body>
+
+<div class="pc-workstation">
+
+  <!-- ══ BEIGE CRT MONITOR (1980s PC) ══ -->
+  <div class="crt-monitor-frame">
+    
+    <div class="monitor-top-bar">
+      <div class="monitor-vents">
+        <div class="vent-slot"></div>
+        <div class="vent-slot"></div>
+      </div>
+      <div class="monitor-brand-badge">PAULO FREIRE ● PC-8086</div>
+      <div class="monitor-vents">
+        <div class="vent-slot"></div>
+        <div class="vent-slot"></div>
+      </div>
+    </div>
+
+    <!-- CRT Screen Bezel -->
+    <div class="crt-screen-bezel">
+      <div class="screen-surface" id="screen-surface">
+        
+        <!-- ══ RESET CONFIRMATION CRT OVERLAY ══ -->
+        <div class="crt-reset-overlay" id="crt-reset-overlay" style="display:none;">
+          <div class="crt-reset-box">
+            <div class="crt-reset-header">
+              <span>⚠️ MS-DOS RECOVERY &amp; RESET MANAGER</span>
+            </div>
+            <div class="crt-reset-body">
+              <div style="color:var(--amber);font-size:1.05rem;font-weight:bold;margin-bottom:6px">
+                ¿REINICIAR SISTEMA Y BORRAR PROGRESO?
+              </div>
+              <p style="color:var(--green-bright);font-size:0.85rem;line-height:1.4;margin-bottom:12px">
+                Se restablecerán todos los módulos a estado pendiente (0/7) y el cronómetro de tiempo comenzará de cero.
+              </p>
+              <div class="crt-reset-actions">
+                <button class="btn-crt-confirm" onclick="confirmResetGame()">[ SÍ, BORRAR TODO (S) ]</button>
+                <button class="btn-crt-cancel" onclick="cancelResetGame()">[ CANCELAR (N) ]</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ MODAL AGREGAR FAMILIA AL TABLERO ══ -->
+        <div class="crt-reset-overlay" id="family-modal-overlay" style="display:none;">
+          <div class="crt-reset-box" style="max-width:440px;border-color:var(--amber);box-shadow:0 0 30px rgba(255,184,0,0.4);">
+            <div class="crt-reset-header" style="background:var(--amber);color:#000;">
+              <span>📸 REGISTRAR FAMILIA EN EL TABLERO</span>
+            </div>
+            <div class="crt-reset-body" style="padding:16px 20px;">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--amber);margin-bottom:10px;">
+                Ingresá el nombre de tu familia y sacá una foto en vivo o subí una de recuerdo:
+              </div>
+              
+              <div style="margin-bottom:10px;text-align:left;">
+                <label style="font-size:0.75rem;color:var(--green);display:block;margin-bottom:4px;">NOMBRE / APELLIDO DE LA FAMILIA:</label>
+                <input type="text" id="input-fam-name" class="escape-input" style="width:100%;font-size:1rem;background:rgba(0,0,0,0.6);border:1px solid var(--green);padding:4px 8px;color:#fff;" placeholder="Ej: Familia Silva Freire" maxlength="40">
+              </div>
+
+              <!-- Photo Actions (Webcam or File) -->
+              <div style="margin-bottom:10px;text-align:left;">
+                <label style="font-size:0.75rem;color:var(--green);display:block;margin-bottom:4px;">FOTO FAMILIAR:</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <button type="button" class="btn-crt-cancel" onclick="startWebcamCapture()" style="cursor:pointer;font-size:0.76rem;padding:5px 10px;background:rgba(255,184,0,0.18);border-color:var(--amber);color:var(--amber);border-radius:4px;">
+                    📷 SACAR FOTO CON CÁMARA
+                  </button>
+                  <label class="btn-crt-cancel" style="cursor:pointer;font-size:0.76rem;padding:5px 10px;background:rgba(51,255,85,0.15);border-radius:4px;">
+                    📁 SUBIR ARCHIVO
+                    <input type="file" id="input-fam-file" accept="image/*" style="display:none" onchange="handleFamilyFile(event)">
+                  </label>
+                </div>
+                <span id="fam-file-label" style="font-size:0.72rem;color:var(--green-dim);display:block;margin-top:4px;">Sin foto capturada</span>
+              </div>
+
+              <!-- Live Webcam Viewfinder -->
+              <div id="webcam-container" style="display:none;flex-direction:column;align-items:center;margin-bottom:12px;background:#051408;border:1px solid var(--amber);border-radius:4px;padding:8px;box-shadow:0 0 14px rgba(255,184,0,0.2);">
+                <div style="font-size:0.75rem;color:var(--amber);margin-bottom:4px;font-family:'Share Tech Mono',monospace;">🔴 CÁMARA WEB EN VIVO</div>
+                <video id="webcam-video" autoplay playsinline style="width:100%;max-width:240px;height:160px;object-fit:cover;border-radius:3px;border:1px solid #44ff66;background:#000;transform:scaleX(-1);"></video>
+                <div style="display:flex;gap:10px;margin-top:8px;">
+                  <button type="button" class="btn-crt-confirm" style="font-size:0.8rem;padding:5px 14px;background:#33ff55;color:#000;font-weight:bold;cursor:pointer;" onclick="takeWebcamSnapshot()">
+                    [ 📸 CAPTURAR AHORA ]
+                  </button>
+                  <button type="button" class="btn-crt-cancel" style="font-size:0.8rem;padding:5px 10px;cursor:pointer;" onclick="stopWebcam()">
+                    [ CANCELAR CÁMARA ]
+                  </button>
+                </div>
+              </div>
+
+              <!-- Polaroid Preview -->
+              <div id="fam-preview-box" style="margin-bottom:12px;display:none;justify-content:center;">
+                <div class="family-polaroid" style="transform:none;margin:0 auto;max-width:130px;padding:5px 5px 8px;">
+                  <div class="family-photo-frame" style="height:90px;">
+                    <img id="fam-preview-img" class="family-photo-img">
+                  </div>
+                  <div id="fam-preview-name" class="family-name-tag"></div>
+                </div>
+              </div>
+
+              <div class="crt-reset-actions">
+                <button class="btn-crt-confirm" onclick="saveFamilyToBoard()">[ 💾 GUARDAR EN TABLERO ]</button>
+                <button class="btn-crt-cancel" onclick="closeAddFamilyModal()">[ CANCELAR ]</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ MODAL HISTORIA DE LA COMPUTADORA 286 (1982) ══ -->
+        <div class="crt-modal-overlay" id="pc286-history-modal" style="display:none;">
+          <div class="crt-modal-box" style="max-width:540px;border-color:var(--amber);box-shadow:0 0 35px rgba(255,184,0,0.45);text-align:left;background:#0d0a06;padding:18px 22px;">
+            
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #4a3010;padding-bottom:8px;margin-bottom:12px;">
+              <div style="font-size:1.05rem;font-weight:bold;color:var(--amber);display:flex;align-items:center;gap:6px;font-family:'VT323',monospace;letter-spacing:1px;">
+                <span>💻</span>
+                <span>LA COMPUTADORA 286 (1982) Y EL SISTEMA DOS</span>
+              </div>
+              <button type="button" onclick="closePC286HistoryModal()" style="background:transparent;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;font-weight:bold;">✕</button>
+            </div>
+
+            <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+              <div style="text-align:center;flex-shrink:0;margin:0 auto;">
+                <img src="assets/images/computadora_286.jpg" alt="Computadora IBM 286 con monitor de fósforo verde" style="width:145px;height:145px;object-fit:cover;border-radius:6px;border:2px solid var(--amber);box-shadow:0 0 16px rgba(255,184,0,0.35);display:block;">
+                <span style="font-size:0.68rem;color:#d0b080;margin-top:4px;display:block;font-family:'Share Tech Mono',monospace;">IBM 286 (1982) / Fósforo Verde</span>
+              </div>
+
+              <div style="flex:1;min-width:220px;font-size:0.82rem;line-height:1.45;color:#e8d8c0;font-family:'Share Tech Mono',monospace;">
+                <div style="background:rgba(255,184,0,0.1);border-left:3px solid var(--amber);padding:5px 8px;margin-bottom:8px;font-weight:bold;color:var(--amber);">
+                  🖥️ La era dorada de la informática (1982):
+                </div>
+                <p style="margin-bottom:6px;">
+                  • <b>El procesador Intel 80286 (1982):</b> Introducido en 1982, fue el corazón de la revolución de las PC compatibles con MS-DOS. Con gabinetes horizontales beige, teclados mecánicos pesados, botón de <i>Turbo</i> y disqueteras de 5¼" y 3½", marcó el inicio de la computación educativa y administrativa.
+                </p>
+                <p>
+                  • <b>Misión del Escape Room:</b> Recrear el ritual analógico y digital de insertar el disquete flexible <code>FREIRE_SYS.DSK</code>, sintonizar cada subsistema e ingresar la clave final.
+                </p>
+              </div>
+            </div>
+
+            <div style="text-align:center;margin-top:14px;border-top:1px solid #4a3010;padding-top:10px;">
+              <button type="button" class="btn-crt-cancel" style="background:var(--amber);color:#000;border:none;font-weight:bold;padding:6px 24px;cursor:pointer;" onclick="closePC286HistoryModal()">
+                [ ENTENDIDO / CERRAR ]
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ══ NO DISK EJECTED SCREEN (PANTALLA VERDE DE ERROR/ESPERA) ══ -->
+        <div class="screen-no-disk-ui" id="screen-no-disk-ui" onclick="toggleFloppy()">
+          <div class="no-disk-glitch-title">► DISQUETE NO DETECTADO EN DRIVE A:</div>
+          <p style="font-size:1rem;color:#77dd88;margin-bottom:6px">Non-System disk or disk error.</p>
+          <p style="font-size:.9rem;color:var(--green-dim);margin-bottom:12px">Replace disk and click when ready.</p>
+          
+          <div class="insert-disk-badge blink">
+            💾 [ INSERTE EL DISQUETE "FREIRE_SYS.DSK" PARA INICIAR EL SISTEMA ]
+          </div>
+
+          <p style="font-size:.8rem;color:#55aa66;margin-top:10px">
+            👉 Haga click aquí o en la <b>Unidad de Disquete A:</b> abajo para insertar el disco.
+          </p>
+
+          <!-- Direct Board Access & History -->
+          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" onclick="event.stopPropagation()">
+            <button class="btn-crt-cancel" onclick="viewFamiliesDirectly()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 14px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
+              👥 VER TABLERO DE FAMILIAS QUE ESCAPARON
+            </button>
+            <button class="btn-crt-cancel" onclick="openPC286HistoryModal()" style="background:rgba(255,184,0,0.15);border:1px solid var(--amber);color:var(--amber);font-size:0.8rem;padding:6px 14px;cursor:pointer;border-radius:4px;box-shadow:0 0 10px rgba(255,184,0,0.25);">
+              💻 VER HISTORIA: COMPUTADORA 286 (1982)
+            </button>
+          </div>
+        </div>
+
+        <!-- ══ MAIN OS SYSTEM UI (OCULTO HASTA INSERTAR DISQUETE) ══ -->
+        <div id="screen-system-ui" style="display:none;width:100%;height:100%">
+          
+          <!-- Screen Header -->
+          <div class="screen-header-line">
+            <div style="display:flex;align-items:center;gap:8px">
+              <img src="logo.png" alt="Colegio Paulo Freire" style="width:22px;height:22px;border-radius:50%;object-fit:contain;background:#ffffff;border:1px solid var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0;">
+              <span class="screen-title">PAULOFREIRE-OS v30</span>
+            </div>
+            <span class="screen-status-badge" id="sys-status">SISTEMA EN PROCESO</span>
+            <span style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--amber);text-shadow:0 0 6px var(--amber)" id="timer-display">⏱ TIEMPO: 00:00</span>
+          </div>
+
+          <!-- Mission Tabs Navigation (1 a 8 + Desafío 9 + Familias) -->
+          <div class="mission-tabs-bar">
+            <button class="mission-tab-btn active" id="tab-m-0" onclick="setMission(0)">1:NOKIA</button>
+            <button class="mission-tab-btn" id="tab-m-1" onclick="setMission(1)">2:TV</button>
+            <button class="mission-tab-btn" id="tab-m-2" onclick="setMission(2)">3:ANTENA</button>
+            <button class="mission-tab-btn" id="tab-m-3" onclick="setMission(3)">4:CAJA</button>
+            <button class="mission-tab-btn" id="tab-m-4" onclick="setMission(4)">5:TELÉFONO</button>
+            <button class="mission-tab-btn" id="tab-m-5" onclick="setMission(5)">6:RADIO</button>
+            <button class="mission-tab-btn" id="tab-m-6" onclick="setMission(6)">7:VINILO</button>
+            <button class="mission-tab-btn" id="tab-m-7" onclick="setMission(7)">8:EMOTICONES</button>
+            <button class="mission-tab-btn tab-final" id="tab-m-8" onclick="setMission(8)">9:COLEGIO</button>
+            <button class="mission-tab-btn" id="tab-m-9" onclick="setMission(9)" style="border-color:var(--amber-dim);color:var(--amber);">👥 FAMILIAS</button>
+          </div>
+
+          <!-- ══ ACTIVE SINGLE MISSION DISPLAY ══ -->
+          <div class="active-mission-card" id="active-mission-container">
+            <div class="m-top-row">
+              <div class="m-title-wrap">
+                <span class="m-icon" id="m-icon">📱</span>
+                <span class="m-title" id="m-title">NOKIA 1100 SMS</span>
+              </div>
+              <span class="m-idx-label" id="m-idx-label">MISIÓN 1 DE 8</span>
+            </div>
+
+            <div class="m-hint-text" id="m-hint">
+              Escribí "COLEGIO PAULO FREIRE" con el teclado T9 para obtener el código.
+            </div>
+
+            <div class="m-status-row">
+              <span id="m-status" style="color:var(--green-dim)">[ ⏳ PENDIENTE DE RESOLUCIÓN ]</span>
+              <span id="m-code" style="color:var(--green-dim)">CÓDIGO: ???</span>
+            </div>
+
+            <div class="m-actions-row">
+              <button class="btn-nav" onclick="prevMission()">◄ ANTERIOR</button>
+              <a href="puzzles/nokia.html" class="btn-enter-mission" id="m-btn-enter">[ 🚀 ACCEDER A LA MISIÓN ]</a>
+              <button class="btn-nav" onclick="nextMission()">SIGUIENTE ►</button>
+            </div>
+          </div>
+
+          <!-- ══ FINAL BIRTHDAY ESCAPE QUESTION CONTAINER ══ -->
+          <div class="final-escape-box" id="final-escape-container">
+            <div class="final-escape-title">
+              <span>🎂</span>
+              <span>FASE FINAL: DESBLOQUEO DEL SISTEMA CENTRAL</span>
+            </div>
+
+            <div class="final-question-text">
+              <b>[PREGUNTA DE SEGURIDAD FINAL]:</b><br>
+              ¿En qué <b>MES y AÑO</b> se fundó el <b>Colegio Paulo Freire</b>?<br>
+              <span style="font-size:.85rem;color:#b89960">
+                (Ingresá la respuesta en formato <code>MM AAAA</code> o <code>MM/AAAA</code> con el teclado).
+              </span>
+            </div>
+
+            <div class="console-input-row">
+              <span class="prompt-sym">C:\&gt;</span>
+              <input type="text" id="escape-input" class="escape-input"
+                     placeholder="MES Y AÑO (EJ: MM AAAA)" maxlength="32" disabled
+                     autocomplete="off" spellcheck="false">
+              <button class="btn-execute" id="btn-execute" disabled onclick="executeEscape()">
+                [ EJECUTAR ]
+              </button>
+            </div>
+            <div id="escape-message" class="escape-message"></div>
+
+            <div style="margin-top:10px;display:flex;justify-content:space-between">
+              <button class="btn-nav" onclick="setMission(7)">◄ VOLVER A MÓDULO 8</button>
+            </div>
+          </div>
+
+          <!-- ══ TABLERO DE FAMILIAS QUE ESCAPARON ══ -->
+          <div class="families-board-box" id="families-board-container" style="display:none;">
+            <div class="families-board-top">
+              <div class="families-board-title">
+                <span>🏆</span>
+                <span>TABLERO DE FAMILIAS QUE ESCAPARON</span>
+              </div>
+            </div>
+            <div style="font-size:0.8rem;color:var(--green-dim);margin:6px 0 10px;border-bottom:1px dashed var(--green-dim);padding-bottom:6px;">
+              Mural de recuerdos del Colegio Paulo Freire • Sin puntos ni rankings: el cuadro de honor exclusivo de las familias que lograron escapar.
+            </div>
+            
+            <div class="families-grid" id="families-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <span style="font-size:.85rem;color:var(--green-dim)">&gt; MÓDULOS PENDIENTES: <span id="remaining-count" style="color:var(--amber)">8</span> / 8</span>
+            <button type="button" class="btn-crt-cancel" onclick="openPC286HistoryModal()" style="background:rgba(255,184,0,0.12);border:1px solid var(--amber);color:var(--amber);font-size:0.75rem;padding:4px 10px;cursor:pointer;border-radius:3px;box-shadow:0 0 8px rgba(255,184,0,0.2);font-family:'Share Tech Mono',monospace;">
+              💻 HISTORIA: COMPUTADORA 286 (1982)
+            </button>
+          </div>
+
+        </div><!-- /screen-system-ui -->
+
+        <!-- ══ VICTORY ESCAPE UI ══ -->
+        <div id="screen-victory-ui" style="display:none;width:100%;height:100%;overflow-y:auto;text-align:center;padding:6px 0;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:360px;animation:fadeInOverlay 0.6s ease;">
+            
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.50rem;line-height:1.1;color:var(--green);text-shadow:0 0 10px var(--green);white-space:pre;overflow-x:auto;">
+ ███████╗███████╗ ██████╗ █████╗ ██████╗  █████╗ ███████╗████████╗███████╗
+ ██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██╔══██╗██╔════╝╚══██╔══╝██╔════╝
+ █████╗  ███████╗██║     ███████║██████╔╝███████║███████╗   ██║   █████╗  
+ ██╔══╝  ╚════██║██║     ██╔══██║██╔═══╝ ██╔══██║╚════██║   ██║   ██╔══╝  
+ ███████╗███████║╚██████╗██║  ██║██║     ██║  ██║███████║   ██║   ███████╗
+ ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝</div>
+
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px;">
+              <img src="assets/images/logo.png" alt="Colegio Paulo Freire" style="width:30px;height:30px;border-radius:50%;object-fit:contain;background:#ffffff;border:2px solid var(--green);box-shadow:0 0 12px var(--green);">
+              <span style="font-size:1.45rem;color:#33ff55;text-shadow:0 0 14px #33ff55;letter-spacing:.25em;font-weight:bold;">¡ E S C A P A S T E !</span>
+            </div>
+            <div style="font-size:0.95rem;color:var(--amber);text-shadow:0 0 8px var(--amber);letter-spacing:.15em;">
+              SISTEMA CENTRAL DE SEGURIDAD DESBLOQUEADO
+            </div>
+
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--green-bright);background:rgba(0,0,0,0.6);padding:8px 16px;border:1px solid var(--green);border-radius:6px;text-align:left;width:100%;max-width:480px;line-height:1.5;margin:2px 0;box-shadow:inset 0 0 20px rgba(0,255,80,0.1);">
+              <div>&gt; COLEGIO PAULO FREIRE: <span style="color:var(--amber)">FUNDADO EN DICIEMBRE 1996 ✓</span></div>
+              <div>&gt; MÓDULOS RESUELTOS: <span style="color:var(--green)">8 / 8 [100% COMPLETADO] ✓</span></div>
+              <div>&gt; TIEMPO TOTAL LOGRADO: <span id="victory-time-val" style="color:#ffd700;font-size:1.15rem;font-weight:bold;text-shadow:0 0 10px #ffd700;">⏱️ 00:00</span></div>
+              <div>&gt; RANGO: <span style="color:var(--green)">MAESTRO ANALÓGICO FREIREANO ⭐</span></div>
+            </div>
+
+            <!-- Inmortalizar en el Tablero de Familias -->
+            <div style="background:rgba(255,184,0,0.08);border:1px dashed var(--amber);border-radius:6px;padding:10px 14px;width:100%;max-width:480px;text-align:center;margin-top:2px;">
+              <div style="color:var(--amber);font-size:0.95rem;font-weight:bold;margin-bottom:4px;">
+                📸 ¡SUMEN A SU FAMILIA AL TABLERO DE ESCAPES!
+              </div>
+              <p style="font-size:0.78rem;color:#ffd080;line-height:1.3;margin-bottom:8px;">
+                Suban su foto y dejen su apellido en el mural de honor de recuerdos.
+              </p>
+              <button class="btn-crt-confirm" style="font-size:0.85rem;padding:5px 14px;background:#ffd700;color:#000;font-weight:bold;cursor:pointer;" onclick="openAddFamilyModal()">
+                [ 📸 REGISTRAR NUESTRA FOTO FAMILIAR ]
+              </button>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+              <button class="btn-puzzle" style="font-size:0.95rem;padding:6px 18px;border-color:var(--amber);color:var(--amber);background:rgba(255,184,0,0.15);cursor:pointer;font-weight:bold;" onclick="restartGame()">
+                [ ⟳ REINICIAR Y JUGAR DE NUEVO ]
+              </button>
+              <button class="btn-puzzle" style="font-size:0.95rem;padding:6px 18px;border-color:var(--green);color:var(--green);background:rgba(51,255,85,0.15);cursor:pointer;font-weight:bold;" onclick="viewFamiliesDirectly()">
+                [ 👥 VER TABLERO DE FAMILIAS ]
+              </button>
+            </div>
+
+          </div>
+        </div><!-- /screen-victory-ui -->
+
+      </div>
+    </div>
+
+    <!-- Monitor Lower Hardware Controls -->
+    <div class="monitor-bottom-bar">
+      <div class="monitor-hardware-controls">
+        <!-- Power Button -->
+        <button class="pc-hw-btn" id="btn-pc-power" onclick="toggleMonitorPower()" title="Interruptor de encendido del Monitor CRT">
+          <div class="monitor-power-led" id="monitor-power-led"></div>
+          <span id="power-btn-label">POWER</span>
+        </button>
+
+        <!-- Reset Button -->
+        <button class="pc-hw-btn pc-hw-reset" id="btn-pc-reset" onclick="requestResetGame()" title="Botón de Reset Hardware de la PC">
+          <span class="reset-dot"></span>
+          <span>RESET</span>
+        </button>
+      </div>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#5a4a35">CRT HIGH RESOLUTION PHOSPHOR GREEN ● 8086 CPU</span>
+    </div>
+
+  </div><!-- /crt-monitor-frame -->
+
+
+  <!-- ══ FLOPPY DISK DRIVE UNIT ══ -->
+  <div class="floppy-drive-unit">
+    <div class="floppy-drive-left">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;font-weight:bold;color:#4a3e2e">DRIVE A:</span>
+      <div class="floppy-slot-container" onclick="toggleFloppy()" title="Click para insertar o expulsar el disquete">
+        <div class="floppy-disk" id="floppy-disk">
+          <span class="floppy-disk-label">💾 FREIRE_SYS.DSK</span>
+        </div>
+      </div>
+      <div class="floppy-led" id="floppy-led"></div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#5a4a35">
+      3.5" DISKETTE UNIT ● 1.44 MB ● MS-DOS BOOT
+    </div>
+  </div>
+
+
+  <!-- ══ RETRO MECHANICAL KEYBOARD ══ -->
+  <div class="retro-keyboard">
+    <div class="keyboard-title">
+      <span>IBM STYLE MECHANICAL KEYBOARD</span>
+      <span>CLICK EN TECLAS O ESCRIBA CON SU TECLADO FÍSICO</span>
+    </div>
+
+    <!-- Number Row -->
+    <div class="keyboard-row">
+      <div class="v-key" data-key="1" onclick="typeVirtualKey('1')">1</div>
+      <div class="v-key" data-key="2" onclick="typeVirtualKey('2')">2</div>
+      <div class="v-key" data-key="3" onclick="typeVirtualKey('3')">3</div>
+      <div class="v-key" data-key="4" onclick="typeVirtualKey('4')">4</div>
+      <div class="v-key" data-key="5" onclick="typeVirtualKey('5')">5</div>
+      <div class="v-key" data-key="6" onclick="typeVirtualKey('6')">6</div>
+      <div class="v-key" data-key="7" onclick="typeVirtualKey('7')">7</div>
+      <div class="v-key" data-key="8" onclick="typeVirtualKey('8')">8</div>
+      <div class="v-key" data-key="9" onclick="typeVirtualKey('9')">9</div>
+      <div class="v-key" data-key="0" onclick="typeVirtualKey('0')">0</div>
+      <div class="v-key" data-key="-" onclick="typeVirtualKey('-')">-</div>
+      <div class="v-key wide-key" data-key="BACKSPACE" onclick="typeVirtualKey('BKSP')">⌫ BORRAR</div>
+    </div>
+
+    <!-- QWERTY Row 1 -->
+    <div class="keyboard-row">
+      <div class="v-key" data-key="Q" onclick="typeVirtualKey('Q')">Q</div>
+      <div class="v-key" data-key="W" onclick="typeVirtualKey('W')">W</div>
+      <div class="v-key" data-key="E" onclick="typeVirtualKey('E')">E</div>
+      <div class="v-key" data-key="R" onclick="typeVirtualKey('R')">R</div>
+      <div class="v-key" data-key="T" onclick="typeVirtualKey('T')">T</div>
+      <div class="v-key" data-key="Y" onclick="typeVirtualKey('Y')">Y</div>
+      <div class="v-key" data-key="U" onclick="typeVirtualKey('U')">U</div>
+      <div class="v-key" data-key="I" onclick="typeVirtualKey('I')">I</div>
+      <div class="v-key" data-key="O" onclick="typeVirtualKey('O')">O</div>
+      <div class="v-key" data-key="P" onclick="typeVirtualKey('P')">P</div>
+    </div>
+
+    <!-- QWERTY Row 2 -->
+    <div class="keyboard-row">
+      <div class="v-key" data-key="A" onclick="typeVirtualKey('A')">A</div>
+      <div class="v-key" data-key="S" onclick="typeVirtualKey('S')">S</div>
+      <div class="v-key" data-key="D" onclick="typeVirtualKey('D')">D</div>
+      <div class="v-key" data-key="F" onclick="typeVirtualKey('F')">F</div>
+      <div class="v-key" data-key="G" onclick="typeVirtualKey('G')">G</div>
+      <div class="v-key" data-key="H" onclick="typeVirtualKey('H')">H</div>
+      <div class="v-key" data-key="J" onclick="typeVirtualKey('J')">J</div>
+      <div class="v-key" data-key="K" onclick="typeVirtualKey('K')">K</div>
+      <div class="v-key" data-key="L" onclick="typeVirtualKey('L')">L</div>
+      <div class="v-key enter-key" data-key="ENTER" onclick="typeVirtualKey('ENTER')">⏎ ENTER</div>
+    </div>
+
+    <!-- QWERTY Row 3 + Space -->
+    <div class="keyboard-row">
+      <div class="v-key" data-key="Z" onclick="typeVirtualKey('Z')">Z</div>
+      <div class="v-key" data-key="X" onclick="typeVirtualKey('X')">X</div>
+      <div class="v-key" data-key="C" onclick="typeVirtualKey('C')">C</div>
+      <div class="v-key" data-key="V" onclick="typeVirtualKey('V')">V</div>
+      <div class="v-key" data-key="B" onclick="typeVirtualKey('B')">B</div>
+      <div class="v-key" data-key="N" onclick="typeVirtualKey('N')">N</div>
+      <div class="v-key" data-key="M" onclick="typeVirtualKey('M')">M</div>
+      <div class="v-key" data-key="/" onclick="typeVirtualKey('/')">/</div>
+      <div class="v-key space-key" data-key=" " onclick="typeVirtualKey('SPACE')">ESPACIO</div>
+    </div>
+
+  </div><!-- /retro-keyboard -->
+
+</div><!-- /pc-workstation -->
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

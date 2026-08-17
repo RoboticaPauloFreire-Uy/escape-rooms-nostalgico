@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caja Fuerte — Módulo Combinación</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    body {
+      background: #080508;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .page-top {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .page-top-title {
+      font-size: 1.3rem;
+      letter-spacing: .15em;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+    }
+
+    .main-layout {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 820px;
+    }
+
+    /* ── SAFE ── */
+    .safe-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Safe body (wall-mounted) */
+    .safe-body {
+      width: 320px;
+      height: 300px;
+      background:
+        linear-gradient(145deg, #5a5a60 0%, #3a3a40 40%, #252528 100%);
+      border-radius: 12px;
+      box-shadow:
+        inset 0 3px 6px rgba(255,255,255,0.15),
+        inset 0 -6px 12px rgba(0,0,0,0.6),
+        0 15px 50px rgba(0,0,0,0.9),
+        0 4px 10px rgba(0,0,0,0.7),
+        inset 4px 0 8px rgba(255,255,255,0.05);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Rivets */
+    .safe-body::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 2px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .rivet {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #9090a0, #404048);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .rivet.tl { top: 14px; left: 14px; }
+    .rivet.tr { top: 14px; right: 14px; }
+    .rivet.bl { bottom: 14px; left: 14px; }
+    .rivet.br { bottom: 14px; right: 14px; }
+
+    /* Safe door (flips open) */
+    .safe-door {
+      width: 250px;
+      height: 240px;
+      background: linear-gradient(145deg, #6a6a72 0%, #4a4a52 50%, #303038 100%);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 2px 4px rgba(255,255,255,0.12),
+        inset 0 -4px 8px rgba(0,0,0,0.5),
+        2px 0 8px rgba(0,0,0,0.4);
+      position: relative;
+      transform-origin: left center;
+      transition: transform 1.2s cubic-bezier(.4, 0, .2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .safe-door.open {
+      transform: perspective(600px) rotateY(-75deg);
+    }
+
+    /* Door panel border */
+    .safe-door::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    /* Handle */
+    .safe-handle {
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 52px;
+      background: linear-gradient(180deg, #d0c8b0, #8a8270);
+      border-radius: 7px;
+      box-shadow: 2px 0 6px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4);
+    }
+
+    /* Hinge */
+    .safe-hinge {
+      position: absolute;
+      left: -8px;
+      background: linear-gradient(90deg, #8a8a90, #5a5a60);
+      border-radius: 4px;
+      width: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .safe-hinge.top    { top: 20px; height: 20px; }
+    .safe-hinge.bottom { bottom: 20px; height: 20px; }
+
+    /* ── DIAL ── */
+    .dial-container {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .dial-ring {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #d0c8b8 0%, #8a8275 40%, #4a4238 80%, #2a2018 100%);
+      box-shadow:
+        0 4px 15px rgba(0,0,0,0.8),
+        inset 0 2px 5px rgba(255,255,255,0.3),
+        inset 0 -4px 8px rgba(0,0,0,0.6);
+      position: relative;
+      cursor: grab;
+      user-select: none;
+      transform-origin: 50% 50%;
+    }
+    .dial-ring:active { cursor: grabbing; }
+
+    /* Center hub */
+    .dial-hub {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #b0a898, #5a5248);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.4);
+      border: 2px solid #332820;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Indicator arrow at top (12 o'clock) */
+    .dial-indicator {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 13px solid #ee2200;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Current number display */
+    .dial-number-display {
+      margin-top: 8px;
+      width: 52px;
+      height: 22px;
+      background: #100a04;
+      border: 1px solid #ff6600;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      color: #ff8800;
+      text-shadow: 0 0 8px #ff4400;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
+      z-index: 6;
+    }
+
+    /* Numbers canvas */
+    canvas#dial-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* ── Safe interior (shown when open) ── */
+    .safe-interior {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1a1008, #0d0804);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1s .8s;
+      z-index: -1;
+    }
+    .safe-door.open ~ .safe-interior { opacity: 1; z-index: 0; }
+    /* Actually the interior is inside safe-body, behind door */
+
+    /* ── Right panel ── */
+    .right-panel {
+      max-width: 300px;
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Step tracker */
+    .steps-tracker {
+      background: rgba(51,255,85,.03);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+    }
+    .steps-tracker h4 {
+      font-size: 1rem;
+      letter-spacing: .1em;
+      color: var(--amber);
+      text-shadow: 0 0 8px var(--amber);
+      margin-bottom: 12px;
+    }
+    .step-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.3);
+      transition: all .3s;
+    }
+    .step-row.active {
+      border-color: var(--amber-dim);
+      background: rgba(255,184,0,.06);
+    }
+    .step-row.done {
+      border-color: var(--green-dim);
+      background: rgba(51,255,85,.06);
+    }
+    .step-icon { font-size: 1.1rem; }
+    .step-text {
+      font-size: .9rem;
+      color: var(--green-dim);
+      letter-spacing: .05em;
+    }
+    .step-row.active .step-text { color: var(--amber); text-shadow: 0 0 6px var(--amber); }
+    .step-row.done  .step-text { color: var(--green); text-shadow: 0 0 6px var(--green); }
+    .step-status {
+      margin-left: auto;
+      font-size: .9rem;
+    }
+    .step-row.active .step-status { color: var(--amber); }
+    .step-row.done  .step-status { color: var(--green); }
+
+    /* Direction indicator */
+    .dir-display {
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--green-dim);
+      margin-top: 8px;
+      letter-spacing: .08em;
+    }
+    .dir-display .dir-arrow { font-size: 1.5rem; }
+    .dir-display.right { color: var(--amber); text-shadow: 0 0 8px var(--amber); }
+    .dir-display.left  { color: #55aaff; text-shadow: 0 0 8px #55aaff; }
+
+    /* Clue note */
+    .clue-note {
+      background: #f0ddb8;
+      padding: 16px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+      transform: rotate(1.5deg);
+      font-family: 'Share Tech Mono', monospace;
+      color: #2a1808;
+    }
+    .clue-note h3 {
+      font-size: .7rem;
+      letter-spacing: .1em;
+      border-bottom: 1px solid #a07840;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .combination-hint {
+      font-size: 1.1rem;
+      letter-spacing: .15em;
+      color: #5a1800;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .clue-note p { font-size: .62rem; line-height: 1.7; }
+
+    /* Code reveal */
+    .code-reveal {
+      display: none;
+      text-align: center;
+      padding: 18px 24px;
+      border: 1px solid var(--amber);
+      background: rgba(255,184,0,.05);
+      animation: pulseAmber 1.5s infinite alternate;
+    }
+    .code-reveal.show { display: block; }
+    .code-reveal h3 {
+      font-size: 1rem;
+      color: var(--amber);
+      letter-spacing: .12em;
+      text-shadow: 0 0 10px var(--amber);
+      margin-bottom: 8px;
+    }
+    .code-reveal .code-digits {
+      font-size: 3.5rem;
+      color: var(--amber);
+      text-shadow: 0 0 25px var(--amber), 0 0 5px var(--amber);
+      letter-spacing: .5em;
+    }
+    @keyframes pulseAmber {
+      from { box-shadow: 0 0 10px rgba(255,184,0,.2); }
+      to   { box-shadow: 0 0 30px rgba(255,184,0,.4); }
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--green-dim);
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      letter-spacing: .1em;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: all .2s;
+      align-self: center;
+    }
+    .reset-btn:hover {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    /* Modal styles */
+    .hint-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 5, 0, 0.88);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .hint-confirm-box {
+      background: #0d0a06;
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 25px rgba(255, 184, 0, 0.4);
+      border-radius: 6px;
+      max-width: 380px;
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .btn-hint-act {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-unlock-hint {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
+      padding: 7px 12px;
+      width: 100%;
+      background: rgba(255, 184, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 184, 0, 0.25);
+      transition: all 0.15s;
+    }
+    .btn-unlock-hint:hover {
+      background: var(--amber);
+      color: #000;
+      box-shadow: 0 0 16px var(--amber);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-top">
+    <div class="page-top-title glow">🔐 MÓDULO 4 — CAJA FUERTE</div>
+    <a href="../index.html" class="btn-back">◄ PANEL CENTRAL</a>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- SAFE -->
+    <div class="safe-wrapper">
+      <div class="safe-body" id="safe-body">
+        <div class="rivet tl"></div>
+        <div class="rivet tr"></div>
+        <div class="rivet bl"></div>
+        <div class="rivet br"></div>
+
+        <!-- Safe Door -->
+        <div class="safe-door" id="safe-door">
+          <div class="safe-hinge top"></div>
+          <div class="safe-hinge bottom"></div>
+          <div class="safe-handle" id="safe-handle"></div>
+
+          <!-- Dial assembly -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div class="dial-container">
+              <div class="dial-indicator"></div>
+              <div class="dial-ring" id="dial-ring">
+                <canvas id="dial-canvas" width="160" height="160"></canvas>
+                <div class="dial-hub"></div>
+              </div>
+            </div>
+            <div class="dial-number-display" id="dial-num-display">00</div>
+          </div>
+        </div>
+
+        <!-- Interior (visible when door opens) -->
+        <div id="safe-interior" style="
+          position:absolute; inset:0; border-radius:12px;
+          background:linear-gradient(135deg,#1a1008,#0d0804);
+          display:flex; flex-direction:column;
+          align-items:center; justify-content:center;
+          opacity:0; transition:opacity 1.2s 1s;
+          padding:20px; text-align:center;
+          font-family:'Share Tech Mono',monospace;
+          pointer-events:none; z-index:0;
+        ">
+          <div style="font-size:.6rem;color:#8a6030;letter-spacing:.1em;margin-bottom:12px">
+            — INTERIOR DE CAJA FUERTE —
+          </div>
+          <div style="background:#0a0804;border:1px solid #5a3810;padding:12px 20px;margin-bottom:10px">
+            <div style="font-size:.5rem;color:#7a5828;margin-bottom:6px">CÓDIGO GUARDADO:</div>
+            <div style="font-size:2rem;color:#ffb800;text-shadow:0 0 15px #ffb800;letter-spacing:.3em">601</div>
+          </div>
+          <div style="font-size:.5rem;color:#5a3810;line-height:1.6">
+            💰 $1000 PESOS<br>📄 ESCRITURAS<br>🔑 LLAVE EXTRA<br>📸 FOTOS FAMILIARES
+          </div>
+        </div>
+
+      </div><!-- /safe-body -->
+    </div><!-- /safe-wrapper -->
+
+    <!-- Right panel -->
+    <div class="right-panel">
+
+      <!-- Clue note -->
+      <div class="clue-note">
+        <h3>📝 PAPEL ENCONTRADO BAJO EL COLCHÓN</h3>
+        <p>La combinación de la caja es:</p>
+        <div class="combination-hint">→ 15 &nbsp; ← 30 &nbsp; → 20</div>
+        <p>
+          <b>Derecha hasta 15,<br>
+          Izquierda hasta 30,<br>
+          Derecha hasta 20.</b>
+        </p>
+        <p style="margin-top:8px;color:#8a5020">
+          (Girá el dial en la dirección indicada hasta llegar al número exacto.)
+        </p>
+      </div>
+
+      <!-- Safe History Button -->
+      <button type="button" class="btn-unlock-hint" onclick="openSafeHistoryModal()" style="background:rgba(255,184,0,0.12);border:1px solid var(--amber);color:var(--amber);box-shadow:0 0 10px rgba(255,184,0,0.2);margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:'Share Tech Mono',monospace;font-size:0.8rem;padding:7px 10px;border-radius:4px;">
+        <span>🔐</span>
+        <span>VER HISTORIA DE LAS CAJAS FUERTES A DIAL</span>
+      </button>
+
+      <!-- Step tracker -->
+      <div class="steps-tracker">
+        <h4>▶ SECUENCIA DE COMBINACIÓN</h4>
+
+        <div class="step-row active" id="step1-row">
+          <span class="step-icon">→</span>
+          <span class="step-text">DERECHA hasta 15</span>
+          <span class="step-status" id="step1-status">◌</span>
+        </div>
+        <div class="step-row" id="step2-row">
+          <span class="step-icon">←</span>
+          <span class="step-text">IZQUIERDA hasta 30</span>
+          <span class="step-status" id="step2-status">◌</span>
+        </div>
+        <div class="step-row" id="step3-row">
+          <span class="step-icon">→</span>
+          <span class="step-text">DERECHA hasta 20</span>
+          <span class="step-status" id="step3-status">◌</span>
+        </div>
+
+        <div class="dir-display" id="dir-display">
+          <span class="dir-arrow">→</span> GIRÁ A LA DERECHA
+        </div>
+        <div style="font-size:.85rem;color:var(--green-dim);text-align:center;margin-top:6px">
+          Número actual: <span id="current-num" style="color:var(--amber)">0</span>
+        </div>
+      </div>
+
+      <button class="reset-btn" onclick="resetDial()">[ REINICIAR DIAL ]</button>
+
+    </div>
+
+  </div><!-- /main-layout -->
+
+  <!-- ══ MODAL HISTORIA DE LAS CAJAS FUERTES A DIAL ══ -->
+  <div class="hint-confirm-overlay" id="safe-history-modal" style="display:none;z-index:1100;">
+    <div class="hint-confirm-box" style="max-width:520px;border-color:var(--amber);box-shadow:0 0 35px rgba(255,184,0,0.45);text-align:left;background:#0d0a06;padding:18px 22px;">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #4a3010;padding-bottom:8px;margin-bottom:12px;">
+        <div style="font-size:1.05rem;font-weight:bold;color:var(--amber);display:flex;align-items:center;gap:6px;">
+          <span>🔐</span>
+          <span>LAS CAJAS FUERTES DE COMBINACIÓN MECÁNICA</span>
+        </div>
+        <button type="button" onclick="closeSafeHistoryModal()" style="background:transparent;border:none;color:#ff5555;font-size:1.2rem;cursor:pointer;font-weight:bold;">✕</button>
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="text-align:center;flex-shrink:0;margin:0 auto;">
+          <img src="../assets/images/caja_fuerte.jpg" alt="Caja Fuerte Vintage de Acero" style="width:145px;height:145px;object-fit:cover;border-radius:6px;border:2px solid var(--amber);box-shadow:0 0 16px rgba(255,184,0,0.35);display:block;">
+          <span style="font-size:0.68rem;color:#d0b080;margin-top:4px;display:block;">Caja Blindada Clásica</span>
+        </div>
+
+        <div style="flex:1;min-width:220px;font-size:0.82rem;line-height:1.45;color:#e8d8c0;">
+          <div style="background:rgba(255,184,0,0.1);border-left:3px solid var(--amber);padding:5px 8px;margin-bottom:8px;font-weight:bold;color:var(--amber);">
+            🛡️ Seguridad y precisión mecánica:
+          </div>
+          <p style="margin-bottom:6px;">
+            • <b>Cerraduras a Disco y Trinquete:</b> En las décadas pasadas, las oficinas y colegios custodiaban sus registros en sólidas cajas de acero con diales cromados de 40 números y discos internos acoplados.
+          </p>
+          <p style="margin-bottom:6px;">
+            • <b>La Técnica Clásica:</b> Para liberar los pestillos era necesario girar el dial en secuencias alternadas (derecha, izquierda, derecha) con paciencia y oído atento a cada *clic*.
+          </p>
+          <p>
+            • <b>Misión en el Colegio:</b> En 1996, las actas fundacionales y códigos de los servidores del Colegio Paulo Freire se resguardaban bajo este mecanismo indestructible.
+          </p>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;border-top:1px solid #4a3010;padding-top:10px;">
+        <button type="button" class="btn-hint-act btn-hint-no" style="background:var(--amber);color:#000;border:none;font-weight:bold;padding:6px 24px;" onclick="closeSafeHistoryModal()">
+          [ ENTENDIDO / CERRAR ]
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  function openSafeHistoryModal() { document.getElementById('safe-history-modal').style.display = 'flex'; }
+  function closeSafeHistoryModal() { document.getElementById('safe-history-modal').style.display = 'none'; }
+
+  const SECRET    = '601';
+  // Combination: right to 15, left to 30, right to 20
+  const COMBO = [
+    { dir: 'right', target: 15 },
+    { dir: 'left',  target: 30 },
+    { dir: 'right', target: 20 }
+  ];
+
+  const TOTAL_NUMS = 40;  // 0-39
+
+  let dialAngle       = 0;  // CSS rotation angle in degrees
+  let currentNum      = 0;  // current number under indicator (0-39)
+  let step            = 0;  // which step we're on (0,1,2)
+  let solved          = false;
+
+  let dragging        = false;
+  let prevPointerAngle = 0;
+  let cumulativeAngle = 0;
+
+  // ── Draw dial face on canvas ──────────────────────────────
+  const dialCanvas = document.getElementById('dial-canvas');
+  const dialCtx    = dialCanvas.getContext('2d');
+
+  function drawDialFace() {
+    const w = 160, h = 160, cx = 80, cy = 80, r = 74;
+    dialCtx.clearRect(0, 0, w, h);
+
+    // Outer border ring
+    dialCtx.beginPath();
+    dialCtx.arc(cx, cy, r, 0, Math.PI * 2);
+    dialCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+    dialCtx.lineWidth   = 2;
+    dialCtx.stroke();
+
+    for (let i = 0; i < TOTAL_NUMS; i++) {
+      // Counter-clockwise layout so rotating dial clockwise increments number at top (12 o'clock)
+      const angle = - (i / TOTAL_NUMS) * Math.PI * 2 - Math.PI / 2;
+      const isMain = i % 5 === 0;
+
+      // Tick mark
+      const tickInner = r - (isMain ? 14 : 7);
+      const tickOuter = r - 2;
+      dialCtx.beginPath();
+      dialCtx.moveTo(
+        cx + Math.cos(angle) * tickInner,
+        cy + Math.sin(angle) * tickInner
+      );
+      dialCtx.lineTo(
+        cx + Math.cos(angle) * tickOuter,
+        cy + Math.sin(angle) * tickOuter
+      );
+      dialCtx.strokeStyle = isMain ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)';
+      dialCtx.lineWidth   = isMain ? 2 : 1;
+      dialCtx.stroke();
+
+      // Number labels
+      if (isMain) {
+        const numR = r - 23;
+        dialCtx.font         = 'bold 11px "Share Tech Mono", monospace';
+        dialCtx.fillStyle    = 'rgba(255,230,190,0.95)';
+        dialCtx.textAlign    = 'center';
+        dialCtx.textBaseline = 'middle';
+        dialCtx.fillText(
+          String(i).padStart(2, '0'),
+          cx + Math.cos(angle) * numR,
+          cy + Math.sin(angle) * numR
+        );
+      }
+    }
+  }
+
+  drawDialFace();
+
+  // ── UI update ─────────────────────────────────────────────
+  function updateDialUI() {
+    document.getElementById('dial-num-display').textContent = String(currentNum).padStart(2, '0');
+    document.getElementById('current-num').textContent      = currentNum;
+    document.getElementById('dial-ring').style.transform    = `rotate(${dialAngle}deg)`;
+  }
+
+  function updateStepUI() {
+    const rows     = ['step1-row', 'step2-row', 'step3-row'];
+    const statuses = ['step1-status', 'step2-status', 'step3-status'];
+    const dirEl    = document.getElementById('dir-display');
+
+    rows.forEach((id, i) => {
+      const row = document.getElementById(id);
+      const sts = document.getElementById(statuses[i]);
+      row.className = 'step-row';
+      if (i < step) {
+        row.classList.add('done');
+        sts.textContent = '✓';
+      } else if (i === step && !solved) {
+        row.classList.add('active');
+        sts.textContent = '▶';
+      }
+    });
+
+    if (!solved && step < 3) {
+      const c = COMBO[step];
+      if (c.dir === 'right') {
+        dirEl.className   = 'dir-display right';
+        dirEl.innerHTML   = '<span class="dir-arrow">→</span> GIRÁ A LA DERECHA';
+      } else {
+        dirEl.className   = 'dir-display left';
+        dirEl.innerHTML   = '<span class="dir-arrow">←</span> GIRÁ A LA IZQUIERDA';
+      }
+    } else if (solved) {
+      dirEl.className   = 'dir-display';
+      dirEl.innerHTML   = '✓ ¡COMBINACIÓN CORRECTA!';
+      dirEl.style.color = 'var(--green)';
+    }
+  }
+
+  // ── Web Audio Sound Synthesizer ───────────────────────────
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  // Clic mecánico metálico de la perilla del dial
+  function playDialClick() {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      const baseFreq = 1600 + Math.random() * 200;
+      osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.025);
+
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.035);
+    } catch(e) {}
+  }
+
+  // Clic de encastre de paso correcto (combinación)
+  function playStepClick() {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(550, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
+  // Desbloqueo y apertura de cerradura pesada de caja fuerte
+  function playSafeUnlockSound() {
+    try {
+      const ctx = getAudioCtx();
+      // Golpe de cerrojo metálico
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.25);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+
+      // Chime de éxito
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(freq, ctx.currentTime + 0.15 + i * 0.1);
+        g.gain.setValueAtTime(0.1, ctx.currentTime + 0.15 + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15 + i * 0.1 + 0.3);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(ctx.currentTime + 0.15 + i * 0.1);
+        o.stop(ctx.currentTime + 0.15 + i * 0.1 + 0.35);
+      });
+    } catch(e) {}
+  }
+
+  // ── Dial drag con ángulo polar (atan2) ────────────────────
+  const dialRing = document.getElementById('dial-ring');
+
+  function getPointerAngle(clientX, clientY) {
+    const rect = dialRing.getBoundingClientRect();
+    const cx   = rect.left + rect.width  / 2;
+    const cy   = rect.top  + rect.height / 2;
+    return Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
+  }
+
+  function startDrag(clientX, clientY) {
+    if (solved) return;
+    getAudioCtx();
+    dragging         = true;
+    prevPointerAngle = getPointerAngle(clientX, clientY);
+  }
+
+  function onDrag(clientX, clientY) {
+    if (!dragging) return;
+
+    const curAngle = getPointerAngle(clientX, clientY);
+    let delta = curAngle - prevPointerAngle;
+
+    if (delta >  180) delta -= 360;
+    if (delta < -180) delta += 360;
+
+    prevPointerAngle = curAngle;
+    cumulativeAngle += delta;
+
+    dialAngle = cumulativeAngle;
+    dialRing.style.transform = `rotate(${dialAngle}deg)`;
+
+    // Dirección
+    const direction = delta > 0.2 ? 'right' : delta < -0.2 ? 'left' : null;
+
+    // Calcular número en el indicador superior (360° / 40 = 9° por número)
+    const degsPerNum = 360 / TOTAL_NUMS;
+    let newNum = Math.round(cumulativeAngle / degsPerNum) % TOTAL_NUMS;
+    if (newNum < 0) newNum += TOTAL_NUMS;
+
+    if (newNum !== currentNum) {
+      currentNum = newNum;
+      // Sonido de clic mecánico por cada muesca del dial
+      playDialClick();
+
+      if (direction && !solved && step < COMBO.length) {
+        checkStep(direction);
+      }
+      updateDialUI();
+    }
+  }
+
+  dialRing.addEventListener('mousedown', e => { startDrag(e.clientX, e.clientY); e.preventDefault(); });
+  document.addEventListener('mousemove', e => onDrag(e.clientX, e.clientY));
+  document.addEventListener('mouseup',  () => { dragging = false; });
+
+  dialRing.addEventListener('touchstart', e => {
+    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchmove', e => {
+    if (dragging) { onDrag(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+  }, { passive: false });
+  document.addEventListener('touchend', () => { dragging = false; });
+
+  // ── Step checking ─────────────────────────────────────────
+  function checkStep(direction) {
+    const current = COMBO[step];
+
+    const dirOk = (current.dir === 'right' && direction === 'right') ||
+                  (current.dir === 'left'  && direction === 'left');
+
+    if (dirOk && currentNum === current.target) {
+      step++;
+      playStepClick();
+      if (step >= COMBO.length) {
+        setTimeout(unlockSafe, 400);
+      }
+      updateStepUI();
+    }
+  }
+
+  function unlockSafe() {
+    if (solved) return;
+    solved = true;
+    localStorage.setItem('er_safe', SECRET);
+
+    // Sonido de apertura de caja fuerte
+    playSafeUnlockSound();
+
+    // Abrir puerta
+    document.getElementById('safe-door').classList.add('open');
+
+    // Mostrar interior
+    setTimeout(() => {
+      document.getElementById('safe-interior').style.opacity = '1';
+    }, 1000);
+
+    updateStepUI();
+  }
+
+  function resetDial() {
+    if (solved) return;
+    step            = 0;
+    dialAngle       = 0;
+    cumulativeAngle = 0;
+    currentNum      = 0;
+    updateDialUI();
+    updateStepUI();
+  }
+
+  document.addEventListener('keydown', e => {
+    const historyModal = document.getElementById('safe-history-modal');
+    if (historyModal && historyModal.style.display === 'flex') {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault();
+        closeSafeHistoryModal();
+      }
+    }
+  });
+
+  // ── Init ─────────────────────────────────────────────────
+  updateDialUI();
+  updateStepUI();
+
+  if (localStorage.getItem('er_safe')) {
+    solved = true;
+    step   = 3;
+    document.getElementById('safe-door').classList.add('open');
+    setTimeout(() => { document.getElementById('safe-interior').style.opacity = '1'; }, 100);
+    updateStepUI();
+  }
+</script>
+</body>
+</html>
